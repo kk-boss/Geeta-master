@@ -1,45 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 
 // import '../book.dart';
-import '../util/getData.dart';
-import '../widgets/datalist.dart';
+import '../widgets/verse.dart';
+import '../providers/data.dart';
+import '../controllers/sharedprefs.dart';
 
-class Bookmarks extends StatefulWidget {
-  @override
-  _BookmarksState createState() => _BookmarksState();
-}
-
-class _BookmarksState extends State<Bookmarks> {
-  int id;
-  int chapter;
-  int verse;
-  int _val;
-  @override
-  void initState() {
-    super.initState();
-    // _loadprefs();
-  }
-  Future<int> getLang() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    _val = prefs.getInt('lang') ?? 0;
-    return _val;
-  }
-  // _loadprefs() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   setState(() {
-  //     chapter = prefs.getInt('bookChapter') ?? 0;
-  //     id = prefs.getInt('bookId') ?? 0;
-  //     verse = prefs.getInt('bookVerse') ?? 0;
-  //   });
-  // }
-
+class Bookmarks extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final dataProvider = Provider.of<DataProvider>(context);
+    final getBook = dataProvider.getBookmark();
+    final lang = getLang();
     return Scaffold(
       appBar: AppBar(title: Text('Bookmarks')),
       body: FutureBuilder(
-          future: Future.wait([getBook(),getLang()]),
+          future: Future.wait([getBook, lang]),
           builder: (ctx, snapsot) {
             if (!snapsot.hasData) {
               return Center(
@@ -57,18 +33,73 @@ class _BookmarksState extends State<Bookmarks> {
                 itemCount: items.length,
                 itemBuilder: (ctx, i) {
                   final item = items[i];
-                  final String langData = _val==0?item.nepali:item.english;
-                  print(item.nepali);
+                  final String langData =
+                      snapsot.data[1] == 0 ? item.nepali : item.english;
                   return Dismissible(
-                      key: Key(item.toString()),
-                      onDismissed: (direction) async {
-                        await delBookmark(item.chapter, item.verse);
+                    key: UniqueKey(),
+                    onDismissed: (direction) async {
+                      items.removeAt(i);
+                      await dataProvider
+                          .delBookmark(item.chapter, item.verse)
+                          .then((_) {
+                            Scaffold.of(ctx).removeCurrentSnackBar();
                         Scaffold.of(ctx).showSnackBar(SnackBar(
-                          content: Text('Item Removed from Bookmark'),
+                          content: Text('Verse Removed from Bookmarks'),
                         ));
-                      },
-                      child: buildData(
-                          item.sanskrit, langData, 18, Colors.white,0,1));
+                      });
+                    },
+                    child: Verse(
+                      geeta: item,
+                      translation: langData,
+                      fontSize: 18,
+                      textColor: Colors.white,
+                    ),
+                    background: Container(
+                      padding: const EdgeInsets.only(
+                        right: 12,
+                      ),
+                      alignment: Alignment.centerLeft,
+                      color: Colors.red,
+                      child: Row(
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.only(right: 8.0),
+                            child: Text(
+                              'Delete',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                          Icon(
+                            Icons.delete,
+                            color: Colors.white,
+                          )
+                        ],
+                      ),
+                    ),
+                    secondaryBackground: Container(
+                      padding: const EdgeInsets.only(
+                        right: 12,
+                      ),
+                      alignment: Alignment.centerRight,
+                      color: Colors.red,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.only(right: 8.0),
+                            child: Text(
+                              'Delete',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                          Icon(
+                            Icons.delete,
+                            color: Colors.white,
+                          )
+                        ],
+                      ),
+                    ),
+                  );
                 });
           }),
     );

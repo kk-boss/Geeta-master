@@ -24,8 +24,4 @@ class Geeta {
       'english': english,
     };
   }
-  // @override
-  // String toString() {
-  //   return 'Geeta{book:$book, chapter:$chapter,verse:$verse}';
-  // }
 }

@@ -1,10 +1,6 @@
-import 'dart:io';
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 class Settings extends StatefulWidget {
   Settings({Key key}) : super(key: key);
 
@@ -34,6 +30,11 @@ class _SettingsState extends State<Settings> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     _val = prefs.getInt('lang') ?? 0;
     return _val;
+  }
+
+  Future<void> setChapter(int id) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('chapter$id', 1);
   }
 
   @override
@@ -79,13 +80,10 @@ class _SettingsState extends State<Settings> {
                             await prefs
                                 .setDouble('fontSize', _value)
                                 .then((res) {
-                              res
-                                  ? Scaffold.of(ctx).showSnackBar(SnackBar(
+                              Scaffold.of(ctx).showSnackBar(SnackBar(
                                       content: const Text('Saved'),
-                                    ))
-                                  : Scaffold.of(ctx).showSnackBar(SnackBar(
-                                      content: const Text('Failed'),
                                     ));
+                              Navigator.of(context).pushNamedAndRemoveUntil('/', ModalRoute.withName('/'));
                             });
                           },
                           child: Text('Save')),
@@ -113,35 +111,17 @@ class _SettingsState extends State<Settings> {
                             }
                           })),
                 ),
-                RaisedButton(
-                  onPressed: () async {
-                    var httpClient = http.Client();
-                    var request = http.Request('GET',Uri.parse('https://firebasestorage.googleapis.com/v0/b/dart-kk.appspot.com/o/assets.zip?alt=media&token=a9399e39-0d0a-48dd-b242-a50a29c32b3d'));
-                    var response = httpClient.send(request);
-                    String dir = (await getApplicationDocumentsDirectory()).path;
-                    List<List<int>> chunks = new List(); 
-                    int downloaded = 0;
-                    response.asStream().listen((http.StreamedResponse r){
-                      r.stream.listen((List<int> chunk){
-                        print('per: ${downloaded/r.contentLength * 100}');
-                        chunks.add(chunk);
-                        downloaded += chunk.length;
-                      },
-                      onDone: ()async{
-                        print('per: ${downloaded/r.contentLength * 100}');
-                        File file = new File('$dir/ok.zip');
-                        final Uint8List bytes = Uint8List(r.contentLength);
-                        int offset = 0;
-                        for (List<int> chunk in chunks) {
-                          bytes.setRange(offset, offset + chunk.length, chunk);
-                          offset += chunk.length;
-                        }
-                        await file.writeAsBytes(bytes);
-                        return;
-                      });
-                    });
-                  },
-                  child: Text('Download'),
+                // TextField(
+                //  textInputAction: TextInputAction.done,
+                //  onSubmitted: (txt){
+                //    print(txt);
+                //  },
+                // ),
+                InkWell(
+                  child: ListTile(
+                    title: Text('Download Audios'),
+                  ),
+                  onTap: ()=>Navigator.of(context).pushNamed('/audio'),
                 ),
               ],
             );

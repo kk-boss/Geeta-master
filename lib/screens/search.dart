@@ -1,7 +1,10 @@
-import 'package:flutter/material.dart';
 
-import '../util/getData.dart';
-import '../widgets/datalist.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../widgets/verse.dart';
+import '../providers/data.dart';
+import '../models/geeta.dart';
 
 class Search extends StatefulWidget {
   Search({Key key}) : super(key: key);
@@ -14,16 +17,21 @@ class _SearchState extends State<Search> {
   TextEditingController _text = TextEditingController();
   List<bool> _selections = [true, false, false];
   int _val = 0;
-  bool _buttonSearched = false;
-  List<dynamic> lists;
+  SearchProvider searchProvider;
+  @override
+  void dispose() { 
+    searchProvider.clear();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
+    searchProvider = Provider.of<SearchProvider>(context);
+     List<Geeta> lists = searchProvider.lists;
     return Scaffold(
         appBar: PreferredSize(
           preferredSize: const Size(double.infinity, kToolbarHeight),
           child: Builder(
             builder: (ctx) =>
-                // centerTitle: true,
                 SafeArea(
               child: Container(
                 decoration: BoxDecoration(
@@ -42,10 +50,9 @@ class _SearchState extends State<Search> {
                       title: TextField(
                         controller: _text,
                         onSubmitted: (str) async {
-                          lists = await searchData(str, _val);
-                          setState(() {
-                            _buttonSearched = true;
-                          });
+                          if(str!=''){
+                          await searchProvider.searchData(str, _val);
+                          }
                         },
                         textInputAction: TextInputAction.search,
                         autofocus: true,
@@ -56,28 +63,25 @@ class _SearchState extends State<Search> {
                       trailing: IconButton(
                           icon: Icon(Icons.search),
                           onPressed: () async {
-                            lists = await searchData(_text.text, _val);
-                            setState(() {
-                              _buttonSearched = true;
+                            if(_text.text!=''){
+                            await searchProvider.searchData(_text.text, _val);
+                            }
                               FocusScope.of(context).unfocus();
-                            });
                           })),
                 ),
               ),
             ),
           ),
         ),
-        body: _buttonSearched
+        body: searchProvider.isSearchPressed
             ? lists.length > 0
                 ? ListView.builder(
                     itemCount: lists.length,
                     itemBuilder: (ctx, i) {
                       if (_val == 2) {
-                        return buildData(lists[i].sanskrit, lists[i].english,
-                            18, Colors.white, lists[i].color,1);
+                        return Verse(geeta: lists[i],translation: lists[i].english,fontSize: 18,textColor: Colors.white,);
                       }
-                      return buildData(lists[i].sanskrit, lists[i].nepali, 18,
-                          Colors.white, lists[i].color,1);
+                      return Verse(geeta: lists[i],translation: lists[i].nepali,fontSize: 18,textColor: Colors.white,);
                     })
                 : Center(
                     child: Text('Nothing Found'),
@@ -89,15 +93,15 @@ class _SearchState extends State<Search> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text('Sanskrit'),
+                        child: const Text('Sanskrit'),
                       ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text('Nepali'),
+                        child: const Text('Nepali'),
                       ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text('English'),
+                        child: const Text('English'),
                       ),
                     ],
                     isSelected: _selections,

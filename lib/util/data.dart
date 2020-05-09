@@ -17,12 +17,14 @@ Future<List<Geeta>> getData(int chapter) async {
     return Geeta(book: maps[i]['book'],chapter: maps[i]['chapter'],verse: maps[i]['verse'],sanskrit: maps[i]['sanskrit'],nepali: maps[i]['nepali'],english: maps[i]['english'],color: maps[i]['color']);
   });
 }
-Future<void> addBookmark(int chapter,int verse)async{
+Future<void> addBookmark(int chapter,List<int> verses)async{
   final Future<Database> database = openDatabase(
     Path.join(await getDatabasesPath(), 'geeta.db'),
   );
   final Database db = await database;
+  for (var verse in verses) {
   await db.update('geeta', {'isBookmark': 1},where: 'chapter=? and verse=?',whereArgs: [chapter,verse]);
+  }
   await db.close();
 }
 Future<List<Geeta>> getBook() async {
@@ -33,7 +35,7 @@ Future<List<Geeta>> getBook() async {
   final List<Map<String, dynamic>> maps = await db.query('geeta',where: 'isBookmark=?', whereArgs: [1]);
   await db.close();
   return List.generate(maps.length, (i){
-    return Geeta(book: maps[i]['book'],chapter: maps[i]['chapter'],verse: maps[i]['verse'],sanskrit: maps[i]['sanskrit'],nepali: maps[i]['nepali'],english: maps[i]['english'],);
+    return Geeta(book: maps[i]['book'],chapter: maps[i]['chapter'],verse: maps[i]['verse'],sanskrit: maps[i]['sanskrit'],nepali: maps[i]['nepali'],english: maps[i]['english'],color: maps[i]['color']);
   });
 }
 Future<void> delBookmark(int chapter,int verse)async{
@@ -55,12 +57,14 @@ Future<bool> copyData()async{
   }
   return true;
 }
-Future<void> setColor(int color, int chapter, int verse)async{
+Future<void> setColor(int color, int chapter, List<int> verses)async{
   final Future<Database> database = openDatabase(
     Path.join(await getDatabasesPath(), 'geeta.db'),
   );
   final Database db = await database;
+  for (var verse in verses) {
   await db.update('geeta', {'color': color},where: 'chapter=? and verse=?',whereArgs: [chapter,verse]);
+  }
   await db.close();
 }
 Future<List<Geeta>> searchData(String text, int val)async{

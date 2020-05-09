@@ -32,24 +32,6 @@ Widget drawer(BuildContext context) {
             Navigator.of(context).pushNamed('/settings');
           },
         ),
-        // InkWell(
-        //   child: ListTile(
-        //     leading: Icon(Icons.settings),
-        //     title: Text('Database'),
-        //   ),
-        //   onTap: () {
-        //     Navigator.of(context).pushNamed('/database');
-        //   },
-        // ),
-        //  InkWell(
-        //   child: ListTile(
-        //     leading: Icon(Icons.settings),
-        //     title: Text('Audio'),
-        //   ),
-        //   onTap: () {
-        //     Navigator.of(context).pushNamed('/audio');
-        //   },
-        // ),
       ],
     ),
   ));

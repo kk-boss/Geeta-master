@@ -1,7 +1,6 @@
 import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:native_state/native_state.dart';
 
 import './screens/choice.dart';
 import './screens/bookmarks.dart';
@@ -20,7 +19,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Admob.initialize(getAppId());
   FirebaseAdMob.instance.initialize(appId: FirebaseAdMob.testAppId);
-  runApp(SavedState(child: MyApp()));
+  runApp(MyApp());
 }
 
 class MyApp extends StatefulWidget {

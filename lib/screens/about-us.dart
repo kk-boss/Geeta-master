@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../util/custom_icons_icons.dart';
 
@@ -43,19 +44,34 @@ class AboutUs extends StatelessWidget {
                       CustomIcons.facebook,
                       color: Colors.blue,
                     ),
-                    onPressed: () {}),
+                    onPressed: () async{
+                      const _url = 'https://www.facebook.com/santoshthapa896';
+                      if(await canLaunch(_url)){
+                        await launch(_url);
+                      }
+                    }),
                 IconButton(
                     icon: Icon(
                       CustomIcons.instagram,
                       color: Colors.blue,
                     ),
-                    onPressed: () {}),
+                    onPressed: ()async {
+                      const _url ='https://www.instagram.com/new.santosh.3/';
+                       if(await canLaunch(_url)){
+                        await launch(_url);
+                      }
+                    }),
                 IconButton(
                     icon: Icon(
                       CustomIcons.twitter,
                       color: Colors.blue,
                     ),
-                    onPressed: () {}),
+                    onPressed: () async{
+                      const _url ='https://twitter.com/newsantosh3';
+                       if(await canLaunch(_url)){
+                        await launch(_url);
+                      }
+                    }),
               ],
             ),
             Divider(),

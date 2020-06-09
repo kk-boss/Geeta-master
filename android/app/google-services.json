@@ -1,34 +1,34 @@
 {
   "project_info": {
-    "project_number": "768541122271",
-    "firebase_url": "https://dart-kk.firebaseio.com",
-    "project_id": "dart-kk",
-    "storage_bucket": "dart-kk.appspot.com"
+    "project_number": "599448863235",
+    "firebase_url": "https://shreemad-bhagvad-gita.firebaseio.com",
+    "project_id": "shreemad-bhagvad-gita",
+    "storage_bucket": "shreemad-bhagvad-gita.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:768541122271:android:933ce559520c74116c536a",
+        "mobilesdk_app_id": "1:599448863235:android:5198758b687bb99d10c436",
         "android_client_info": {
           "package_name": "com.bhagavadgita.santosh"
         }
       },
       "oauth_client": [
         {
-          "client_id": "768541122271-mpfh7ke1eojtq0c2n22mcoabb2a1n3df.apps.googleusercontent.com",
+          "client_id": "599448863235-uctfgpc9nngg4eaq8qq3vo0mn73076em.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyASOixK3Z19Doa5ctA3E5fmoKszCFjMsGQ"
+          "current_key": "AIzaSyC6ebTxxFQi8CUGeLiekYEi9i6BJaCz6XE"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "768541122271-mpfh7ke1eojtq0c2n22mcoabb2a1n3df.apps.googleusercontent.com",
+              "client_id": "599448863235-uctfgpc9nngg4eaq8qq3vo0mn73076em.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

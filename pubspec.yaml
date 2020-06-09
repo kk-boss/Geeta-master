@@ -27,15 +27,13 @@ dependencies:
   just_audio: ^0.1.5
   http: ^0.12.0+4
   rxdart: ^0.24.0
-  auto_size_text: ^2.1.0
-  observable: ^0.22.2
+  # auto_size_text: ^2.1.0
+  # observable: ^0.22.2
   archive: ^2.0.11
   flutter_archive: ^0.1.4
-  native_state: ^1.1.0
-  # admob_flutter: ^0.3.4
   firebase_admob: ^0.9.3+2
   connectivity: ^0.4.8+6
-  # flutter_downloader: ^1.4.3
+  url_launcher: ^5.4.10
 
 
   # The following adds the Cupertino Icons font to your application.

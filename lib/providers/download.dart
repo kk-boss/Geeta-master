@@ -1,9 +1,11 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:path/path.dart' as Path;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
+import '../models/audio.dart';
+import '../data/audio.dart';
+import '../util/database.dart';
 
 class Audio {
   final int chapter;
@@ -18,15 +20,17 @@ class Audio {
 }
 
 class Download with ChangeNotifier {
-  static Future<bool> copyData() async {
-    String path = Path.join(await getDatabasesPath(), 'audio.db');
-    if (FileSystemEntity.typeSync(path) == FileSystemEntityType.notFound) {
-      ByteData data = await rootBundle.load(Path.join('assets', 'audio.db'));
-      List<int> bytes =
-          data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
-      await new File(path).writeAsBytes(bytes).then((file) {
-        print('copied audio');
+  static Future<bool> copyAudioData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int isDbinserted = prefs.getInt("isAudioCreated");
+    if (isDbinserted == null) {
+      await Future.forEach(AUDIO, (element) async {
+        await createAudioData(MyAudio(
+          chapter: element["chapter"],
+          id: element["id"],
+        ));
       });
+      await prefs.setInt("isAudioCreated", 1);
     }
     return true;
   }
@@ -52,7 +56,7 @@ class Download with ChangeNotifier {
     });
   }
 
-  static Future<void> updateAudio(int chapter,bool type) async {
+  static Future<void> updateAudio(int chapter, bool type) async {
     final Future<Database> database = openDatabase(
       Path.join(await getDatabasesPath(), 'audio.db'),
       onCreate: (db, version) {
@@ -63,19 +67,19 @@ class Download with ChangeNotifier {
       version: 1,
     );
     final Database db = await database;
-    if(type){
-    await db.update('audio', {'download': 1},
-        where: 'chapter=?', whereArgs: [chapter]);
+    if (type) {
+      await db.update('audio', {'download': 1},
+          where: 'chapter=?', whereArgs: [chapter]);
     } else {
       await db.update('audio', {'download': 0},
-        where: 'chapter=?', whereArgs: [chapter]);
+          where: 'chapter=?', whereArgs: [chapter]);
     }
     await db.close();
   }
- Future<List<Audio>> getAudioData() async {
-    final Future<Database> database = openDatabase(
-      Path.join(await getDatabasesPath(), 'audio.db')
-    );
+
+  Future<List<Audio>> getAudioData() async {
+    final Future<Database> database =
+        openDatabase(Path.join(await getDatabasesPath(), 'audio.db'));
     final Database db = await database;
     final List<Map<String, dynamic>> maps = await db.query('audio');
     await db.close();

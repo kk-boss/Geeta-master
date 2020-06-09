@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
+import '../controllers/sharedprefs.dart';
 
 class Settings extends StatefulWidget {
   Settings({Key key}) : super(key: key);
@@ -16,25 +17,8 @@ class _SettingsState extends State<Settings> {
   @override
   void initState() {
     super.initState();
-    fontSize = getFont();
-    lang = getLang();
-  }
-
-  Future<double> getFont() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    _value = prefs.getDouble('fontSize') ?? 18.0;
-    return _value;
-  }
-
-  Future<int> getLang() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    _val = prefs.getInt('lang') ?? 0;
-    return _val;
-  }
-
-  Future<void> setChapter(int id) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('chapter$id', 1);
+    fontSize = getFont().then((value) => _value=value);
+    lang = getLang().then((value) => _val = value);
   }
 
   @override
@@ -75,15 +59,8 @@ class _SettingsState extends State<Settings> {
                           }),
                       RaisedButton(
                           onPressed: () async {
-                            SharedPreferences prefs =
-                                await SharedPreferences.getInstance();
-                            await prefs
-                                .setDouble('fontSize', _value)
-                                .then((res) {
-                              Scaffold.of(ctx).showSnackBar(SnackBar(
-                                      content: const Text('Saved'),
-                                    ));
-                              Navigator.of(context).pushNamedAndRemoveUntil('/', ModalRoute.withName('/'));
+                            await setFont(_value).then((_) => {
+                               Navigator.of(context).pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false)
                             });
                           },
                           child: Text('Save')),
@@ -99,30 +76,22 @@ class _SettingsState extends State<Settings> {
                           ],
                           onChanged: (val) async {
                             if (val != null) {
-                              SharedPreferences prefs =
-                                  await SharedPreferences.getInstance();
-                              await prefs.setInt('lang', val);
-                              setState(() {
-                                Scaffold.of(ctx).showSnackBar(SnackBar(
-                                    content:
-                                        Text('Restart app to change effect')));
-                                _val = val;
-                              });
+                             await setLang(val);
+                            Navigator.of(context).pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
                             }
                           })),
                 ),
-                // TextField(
-                //  textInputAction: TextInputAction.done,
-                //  onSubmitted: (txt){
-                //    print(txt);
-                //  },
-                // ),
                 InkWell(
                   child: ListTile(
                     title: Text('Download Audios'),
                   ),
                   onTap: ()=>Navigator.of(context).pushNamed('/audio'),
                 ),
+                // TextField(
+                //   onSubmitted: (str){
+                //     print(str);
+                //   },
+                // ),
               ],
             );
           }),

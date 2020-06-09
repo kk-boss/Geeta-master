@@ -44,7 +44,8 @@ class Bookmarks extends StatelessWidget {
                           .then((_) {
                             Scaffold.of(ctx).removeCurrentSnackBar();
                         Scaffold.of(ctx).showSnackBar(SnackBar(
-                          content: Text('Verse Removed from Bookmarks'),
+                          content: const Text('Verse Removed from Bookmarks'),
+                          behavior: SnackBarBehavior.floating,
                         ));
                       });
                     },

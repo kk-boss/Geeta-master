@@ -1,5 +1,7 @@
+import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:native_state/native_state.dart';
 
 import './screens/choice.dart';
 import './screens/bookmarks.dart';
@@ -11,12 +13,56 @@ import './providers/audio.dart';
 import './providers/selection.dart';
 import './providers/data.dart';
 import './providers/download.dart';
+import './screens/about-app.dart';
+import './screens/about-us.dart';
 
 void main() async {
-  runApp(MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  // Admob.initialize(getAppId());
+  FirebaseAdMob.instance.initialize(appId: FirebaseAdMob.testAppId);
+  runApp(SavedState(child: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  double _bottomPadding = 0.0;
+  BannerAd _bannerAd;
+  @override
+  void initState() { 
+    super.initState();
+    _bannerAd = createBannerAd()..load();
+  }
+  BannerAd createBannerAd() {
+    return BannerAd(
+      adUnitId: BannerAd.testAdUnitId,
+      size: AdSize.banner,
+      listener: (MobileAdEvent event) {
+        print("BannerAd event $event");
+        if(event==MobileAdEvent.failedToLoad){
+          if(_bottomPadding!=0.0)
+          setState(() {
+            _bottomPadding = 0.0;
+          });
+        }
+        if(event==MobileAdEvent.loaded){
+          if(_bottomPadding!=50.0)
+          setState(() {
+            _bottomPadding = 50.0;
+          });
+        }
+      },
+    );
+  }
+  @override
+  void dispose() {
+    _bannerAd.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -38,18 +84,25 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
-        title: 'Geeta',
-        home: WillPopScope(child: HomePage(),onWillPop: (){
-          return Future.delayed(Duration(seconds: 0),(){
-            return false;
-          });
-        },),
+        title: 'Bhagavad Gita',
+        home: HomePage(),
         routes: {
           '/choice': (ctx) => ChoiceScreen(),
           '/bookmarks': (ctx) => Bookmarks(),
           '/settings': (ctx) => Settings(),
           '/search': (ctx) => Search(),
-          '/audio': (ctx)=>AudioDownload(),
+          '/audio': (ctx) => AudioDownload(),
+          '/aboutApp': (ctx) => AboutApp(),
+          '/aboutUs': (ctx) => AboutUs(),
+        },
+        builder: (context, widget) {
+          _bannerAd..show();
+          return Padding(
+            padding: EdgeInsets.only(
+              bottom: _bottomPadding,
+            ),
+            child: widget,
+          );
         },
       ),
     );

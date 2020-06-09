@@ -1,4 +1,4 @@
-package com.example.santosh
+package com.bhagavadgita.santosh
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity

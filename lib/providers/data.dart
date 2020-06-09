@@ -1,26 +1,30 @@
-import 'package:flutter/material.dart';
 import 'dart:async';
-import 'dart:io';
-import 'package:flutter/services.dart';
+import 'package:flutter/material.dart';
 import 'package:path/path.dart' as Path;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 import '../models/geeta.dart';
+import '../data/geeta.dart';
+import '../util/database.dart';
 
 class DataProvider with ChangeNotifier {
 // List<String> lang = ['sanskrit','nepali','english'];
+int _result = 0;
+int get result => _result;
   Future<List<Geeta>> get fetchBookmark => getBookmark();
   Future<Database> database() async {
     return openDatabase(
       Path.join(await getDatabasesPath(), 'geeta.db'),
     );
   }
-
-  Future<List<Geeta>> getData(int book, int chapter) async {
-    final Future<Database> database = this.database();
+  static Future<List<Geeta>> getData(int book, int chapter) async {
+    final Future<Database> database = openDatabase(
+      Path.join(await getDatabasesPath(), 'geeta.db'),
+    );
     final Database db = await database;
     final List<Map<String, dynamic>> maps = await db.query('geeta',
         where: 'book=? and chapter=?', whereArgs: [book, chapter]);
-    await db.close();
+    // await db.close();
     return List.generate(maps.length, (i) {
       return Geeta(
           book: maps[i]['book'],
@@ -29,11 +33,12 @@ class DataProvider with ChangeNotifier {
           sanskrit: maps[i]['sanskrit'],
           nepali: maps[i]['nepali'],
           english: maps[i]['english'],
-          color: maps[i]['color']);
+          color: maps[i]['color'],
+          isBookmark: maps[i]['isBookmark']);
     });
   }
 
-  Future<void> addBookmark(int id, int chapter, List<int> verses) async {
+  Future<void> addBookmarks(int id, int chapter, List<int> verses) async {
     final Future<Database> database = this.database();
     final Database db = await database;
     for (var verse in verses) {
@@ -41,6 +46,16 @@ class DataProvider with ChangeNotifier {
           where: 'book=? and chapter=? and verse=?',
           whereArgs: [id, chapter, verse]);
     }
+    await db.close();
+  }
+   static  Future<void> addBookmark(int id, int chapter, int verse) async {
+      final Future<Database> database = openDatabase(
+      Path.join(await getDatabasesPath(), 'geeta.db'),
+    );
+    final Database db = await database;
+      await db.update('geeta', {'isBookmark': 1},
+          where: 'book=? and chapter=? and verse=?',
+          whereArgs: [id, chapter, verse]);
     await db.close();
   }
 
@@ -71,19 +86,23 @@ class DataProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  static Future<bool> copyData() async {
-    String path = Path.join(await getDatabasesPath(), 'geeta.db');
-    if (FileSystemEntity.typeSync(path) == FileSystemEntityType.notFound) {
-      ByteData data = await rootBundle.load(Path.join('assets', 'geeta.db'));
-      List<int> bytes =
-          data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
-      await new File(path).writeAsBytes(bytes).then((file) {
-        print('copied');
-      });
+ static Future<bool> copyData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int isDbinserted = prefs.getInt("database");
+    if(isDbinserted==null){
+    await Future.forEach(GEETA,(element) async {
+     await createData(Geeta(
+          book: element["book"],
+          chapter: element["chapter"],
+          verse: element["verse"],
+          nepali: element["nepali"],
+          sanskrit: element["sanskrit"],
+          english: element["english"]));
+    });
+    await prefs.setInt("database", 1);
     }
     return true;
   }
-
   Future<void> setColor(int color, int chapter, List<int> verses) async {
     final Future<Database> database = this.database();
     final Database db = await database;

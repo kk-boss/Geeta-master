@@ -19,13 +19,32 @@ class Modeel {
 class _ChoiceScreenState extends State<ChoiceScreen> {
   int chapterCount = 0;
   int id = 0;
-
+  bool firstRun = true;
+  int initialIndex = 0;
+  @override
+  void initState() {
+    super.initState();  
+  }
+  @override
+  void didChangeDependencies() {
+    if (firstRun) {
+      var routeArgs =
+          ModalRoute.of(context).settings.arguments as Map<String, int>;
+      if (routeArgs != null) {
+        id = routeArgs["id"];
+        chapterCount = BOOK.where((test) => test.id == id).toList()[0].chapter;
+        initialIndex = 1;
+      }
+      firstRun = false;
+    }
+    super.didChangeDependencies();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: DefaultTabController(
         length: 2,
-        initialIndex: 0,
+        initialIndex: initialIndex,
         child: Scaffold(
           appBar: AppBar(
             title: Text('Geeta'),
@@ -67,17 +86,13 @@ class _ChoiceScreenState extends State<ChoiceScreen> {
                       ),
                       decoration: BoxDecoration(color: Colors.deepPurple),
                     ),
-                    onTap: () {
-                      // Navigator.of(ctx).pushReplacementNamed('/', arguments: {
-                      //   'chapter': i,
-                      //   'id': id,
-                      //   'chapterCount': chapterCount,
-                      // });
-                      Navigator.of(ctx).pop({
-                        'chapter': i,
-                        'id': id,
-                        'chapterCount': chapterCount,
-                      });
+                    onTap: () async {
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                          '/', (Route<dynamic> route) => false,
+                          arguments: {
+                            'chapter': i,
+                            'id': id,
+                          });
                     },
                   );
                 },

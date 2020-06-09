@@ -6,6 +6,7 @@ class Geeta {
   final String sanskrit;
   final String english;
   final int color;
+  final int isBookmark;
   Geeta(
       {this.book,
       this.chapter,
@@ -13,7 +14,8 @@ class Geeta {
       this.nepali,
       this.sanskrit,
       this.english,
-      this.color});
+      this.color,
+      this.isBookmark});
   Map<String, dynamic> toMap() {
     return {
       'book': book,

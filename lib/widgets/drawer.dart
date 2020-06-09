@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../util/strings.dart';
 
 Widget drawer(BuildContext context) {
   return Drawer(
@@ -8,7 +9,7 @@ Widget drawer(BuildContext context) {
         InkWell(
           child: ListTile(
             leading: Icon(Icons.home),
-            title: Text('Home'),
+            title: const Text(home),
           ),
           onTap: () {
             Navigator.of(context).pushReplacementNamed('/');
@@ -17,7 +18,7 @@ Widget drawer(BuildContext context) {
         InkWell(
           child: ListTile(
             leading: Icon(Icons.bookmark),
-            title: Text('Bookmarks'),
+            title: const Text(bookmarks),
           ),
           onTap: () {
             Navigator.of(context).pushNamed('/bookmarks');
@@ -26,10 +27,28 @@ Widget drawer(BuildContext context) {
         InkWell(
           child: ListTile(
             leading: Icon(Icons.settings),
-            title: Text('Settings'),
+            title: const Text(settings),
           ),
           onTap: () {
             Navigator.of(context).pushNamed('/settings');
+          },
+        ),
+        InkWell(
+          child: ListTile(
+            leading: Icon(Icons.android),
+            title: const Text('About App'),
+          ),
+          onTap: () {
+            Navigator.of(context).pushNamed('/aboutApp');
+          },
+        ),
+        InkWell(
+          child: ListTile(
+            leading: Icon(Icons.assessment),
+            title: const Text('About Us'),
+          ),
+          onTap: () {
+            Navigator.of(context).pushNamed('/aboutUs');
           },
         ),
       ],

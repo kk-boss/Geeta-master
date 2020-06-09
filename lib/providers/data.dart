@@ -8,15 +8,15 @@ import '../data/geeta.dart';
 import '../util/database.dart';
 
 class DataProvider with ChangeNotifier {
-// List<String> lang = ['sanskrit','nepali','english'];
-int _result = 0;
-int get result => _result;
+  int _result = 0;
+  int get result => _result;
   Future<List<Geeta>> get fetchBookmark => getBookmark();
   Future<Database> database() async {
     return openDatabase(
       Path.join(await getDatabasesPath(), 'geeta.db'),
     );
   }
+
   static Future<List<Geeta>> getData(int book, int chapter) async {
     final Future<Database> database = openDatabase(
       Path.join(await getDatabasesPath(), 'geeta.db'),
@@ -33,8 +33,7 @@ int get result => _result;
           sanskrit: maps[i]['sanskrit'],
           nepali: maps[i]['nepali'],
           english: maps[i]['english'],
-          color: maps[i]['color'],
-          isBookmark: maps[i]['isBookmark']);
+          color: maps[i]['color']);
     });
   }
 
@@ -46,16 +45,6 @@ int get result => _result;
           where: 'book=? and chapter=? and verse=?',
           whereArgs: [id, chapter, verse]);
     }
-    await db.close();
-  }
-   static  Future<void> addBookmark(int id, int chapter, int verse) async {
-      final Future<Database> database = openDatabase(
-      Path.join(await getDatabasesPath(), 'geeta.db'),
-    );
-    final Database db = await database;
-      await db.update('geeta', {'isBookmark': 1},
-          where: 'book=? and chapter=? and verse=?',
-          whereArgs: [id, chapter, verse]);
     await db.close();
   }
 
@@ -86,23 +75,24 @@ int get result => _result;
     notifyListeners();
   }
 
- static Future<bool> copyData() async {
+  static Future<bool> copyData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     int isDbinserted = prefs.getInt("database");
-    if(isDbinserted==null){
-    await Future.forEach(GEETA,(element) async {
-     await createData(Geeta(
-          book: element["book"],
-          chapter: element["chapter"],
-          verse: element["verse"],
-          nepali: element["nepali"],
-          sanskrit: element["sanskrit"],
-          english: element["english"]));
-    });
-    await prefs.setInt("database", 1);
+    if (isDbinserted == null) {
+      await Future.forEach(GEETA, (element) async {
+        await createData(Geeta(
+            book: element["book"],
+            chapter: element["chapter"],
+            verse: element["verse"],
+            nepali: element["nepali"],
+            sanskrit: element["sanskrit"],
+            english: element["english"]));
+      });
+      await prefs.setInt("database", 1);
     }
     return true;
   }
+
   Future<void> setColor(int color, int chapter, List<int> verses) async {
     final Future<Database> database = this.database();
     final Database db = await database;

@@ -21,8 +21,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int currentPage = 0;
-  int id = 7;
+  int _currentPage = 0;
+  int _id = 7;
   PageController _controller = new PageController();
   Future<bool> _copy;
   Future<double> _font;
@@ -31,7 +31,7 @@ class _HomePageState extends State<HomePage> {
   Future<bool> _copyAudio;
   Future<List<Audio>> _audio;
   var _scaffoldKey = GlobalKey<ScaffoldState>();
-  bool isFirstInit = true;
+  bool _isFirstInit = true;
 
   @override
   void initState() {
@@ -42,7 +42,7 @@ class _HomePageState extends State<HomePage> {
       return onValue;
     });
     _copy = DataProvider.copyData().then((onValue) {
-      _geeta = DataProvider.getData(id, currentPage + 1);
+      _geeta = DataProvider.getData(_id, _currentPage + 1);
       return onValue;
     });
     _lang = getLang();
@@ -56,28 +56,28 @@ class _HomePageState extends State<HomePage> {
     int _chapter = restore[1];
     if (_id != null && _chapter != null && _routeArgs == null) {
       print("$_id  $_chapter");
-      id = _id;
-      currentPage = _chapter;
-      _controller = PageController(initialPage: currentPage);
+      _id = _id;
+      _currentPage = _chapter;
+      _controller = PageController(initialPage: _currentPage);
       setState(() {
-        _geeta = DataProvider.getData(id, currentPage+1);
+        _geeta = DataProvider.getData(_id, _currentPage+1);
       });
     }
   }
 
   @override
   void didChangeDependencies() {
-    if (isFirstInit) {
+    if (_isFirstInit) {
       var routeArgs =
           ModalRoute.of(context).settings.arguments as Map<String, int>;
       if (routeArgs != null) {
-        currentPage = routeArgs['chapter'] ?? 0;
-        id = routeArgs['id'] ?? 7;
-        _controller = PageController(initialPage: currentPage);
-        setBookId(id);
-        setChapter(currentPage);
+        _currentPage = routeArgs['chapter'] ?? 0;
+        _id = routeArgs['_id'] ?? 7;
+        _controller = PageController(initialPage: _currentPage);
+        setBookId(_id);
+        setChapter(_currentPage);
       }
-      isFirstInit = false;
+      _isFirstInit = false;
     }
     super.didChangeDependencies();
   }
@@ -86,8 +86,8 @@ class _HomePageState extends State<HomePage> {
     final MediaQueryData mediaquery = MediaQuery.of(context);
     final selectionProvider = Provider.of<Selection>(context);
     final dataProvider = Provider.of<DataProvider>(context);
-    final String title = BOOK.where((test) => test.id == id).toList()[0].title;
-    final int chapter = BOOK.where((test) => test.id == id).toList()[0].chapter;
+    final String title = BOOK.where((test) => test.id == _id).toList()[0].title;
+    final int chapter = BOOK.where((test) => test.id == _id).toList()[0].chapter;
     return Scaffold(
         key: _scaffoldKey,
         appBar: !selectionProvider.verses.contains(true)
@@ -99,13 +99,13 @@ class _HomePageState extends State<HomePage> {
                     Flexible(
                       child: IconButton(
                         icon: Icon(Icons.arrow_back_ios),
-                        onPressed: (currentPage > 0)
+                        onPressed: (_currentPage > 0)
                             ? () async {
-                                _controller.jumpToPage(currentPage - 1);
+                                _controller.jumpToPage(_currentPage - 1);
                                 _geeta =
-                                    DataProvider.getData(id, currentPage + 1);
-                               await setBookId(id);
-                               await setChapter(currentPage);
+                                    DataProvider.getData(_id, _currentPage + 1);
+                               await setBookId(_id);
+                               await setChapter(_currentPage);
                               }
                             : null,
                       ),
@@ -141,13 +141,13 @@ class _HomePageState extends State<HomePage> {
                           decoration: BoxDecoration(
                               color: Color.fromRGBO(31, 32, 122, 1)),
                           child:
-                              Center(child: Text((currentPage + 1).toString())),
+                              Center(child: Text((_currentPage + 1).toString())),
                         ),
                         onTap: () {
                           Navigator.of(context).pushNamed('/choice',
                               arguments: {
-                                'id': id,
-                                'chapter': currentPage + 1
+                                '_id': _id,
+                                'chapter': _currentPage + 1
                               });
                         },
                       ),
@@ -155,13 +155,13 @@ class _HomePageState extends State<HomePage> {
                     Flexible(
                       child: IconButton(
                         icon: Icon(Icons.arrow_forward_ios),
-                        onPressed: (currentPage < chapter - 1)
+                        onPressed: (_currentPage < chapter - 1)
                             ? () async {
-                                _controller.jumpToPage(currentPage + 1);
+                                _controller.jumpToPage(_currentPage + 1);
                                 _geeta =
-                                    DataProvider.getData(id, currentPage + 1);
-                               await setBookId(id);
-                               await setChapter(currentPage);
+                                    DataProvider.getData(_id, _currentPage + 1);
+                               await setBookId(_id);
+                               await setChapter(_currentPage);
                               }
                             : null,
                       ),
@@ -206,7 +206,7 @@ class _HomePageState extends State<HomePage> {
                           icon: Icon(Icons.bookmark),
                           onPressed: () async {
                             await dataProvider.addBookmarks(
-                                id, currentPage + 1, selectionProvider.list);
+                                _id, _currentPage + 1, selectionProvider.list);
                             Scaffold.of(ctx).showSnackBar(SnackBar(
                               content: Text(
                                   selectionProvider.list.length.toString() +
@@ -275,7 +275,7 @@ class _HomePageState extends State<HomePage> {
                             selectionProvider.add(snapshot.length);
                             return Column(
                               children: <Widget>[
-                                if(id==7)
+                                if(_id==7)
                                 Container(
                                   width: double.infinity,
                                   color: Colors.grey,
@@ -323,7 +323,7 @@ class _HomePageState extends State<HomePage> {
               },
               itemCount: chapter,
               onPageChanged: (page) {
-                currentPage = page;
+                _currentPage = page;
                 selectionProvider.clear();
               },
             ),
@@ -340,12 +340,12 @@ class _HomePageState extends State<HomePage> {
                                 color.indexWhere((test) => test == c);
                             await Provider.of<DataProvider>(context,
                                     listen: false)
-                                .setColor(col, currentPage + 1,
+                                .setColor(col, _currentPage + 1,
                                     selectionProvider.list);
                             selectionProvider.clear();
                             setState(() {
                               _geeta =
-                                  DataProvider.getData(id, currentPage + 1);
+                                  DataProvider.getData(_id, _currentPage + 1);
                             });
                           },
                           child: Container(

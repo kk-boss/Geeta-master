@@ -17,16 +17,16 @@ class _SearchState extends State<Search> {
   TextEditingController _text = TextEditingController();
   List<bool> _selections = [true, false, false];
   int _val = 0;
-  SearchProvider searchProvider;
+  SearchProvider _searchProvider;
   @override
   void dispose() { 
-    searchProvider.clear();
+    _searchProvider.clear();
     super.dispose();
   }
   @override
   Widget build(BuildContext context) {
-    searchProvider = Provider.of<SearchProvider>(context);
-     List<Geeta> lists = searchProvider.lists;
+    _searchProvider = Provider.of<SearchProvider>(context);
+     List<Geeta> lists = _searchProvider.lists;
     return Scaffold(
         appBar: PreferredSize(
           preferredSize: const Size(double.infinity, kToolbarHeight),
@@ -51,7 +51,7 @@ class _SearchState extends State<Search> {
                         controller: _text,
                         onSubmitted: (str) async {
                           if(str!=''){
-                          await searchProvider.searchData(str, _val);
+                          await _searchProvider.searchData(str, _val);
                           }
                         },
                         textInputAction: TextInputAction.search,
@@ -64,7 +64,7 @@ class _SearchState extends State<Search> {
                           icon: Icon(Icons.search),
                           onPressed: () async {
                             if(_text.text!=''){
-                            await searchProvider.searchData(_text.text, _val);
+                            await _searchProvider.searchData(_text.text, _val);
                             }
                               FocusScope.of(context).unfocus();
                           })),
@@ -73,7 +73,7 @@ class _SearchState extends State<Search> {
             ),
           ),
         ),
-        body: searchProvider.isSearchPressed
+        body: _searchProvider.isSearchPressed
             ? lists.length > 0
                 ? ListView.builder(
                     itemCount: lists.length,
@@ -84,7 +84,7 @@ class _SearchState extends State<Search> {
                       return Verse(geeta: lists[i],translation: lists[i].nepali,fontSize: 18,textColor: Colors.white,);
                     })
                 : Center(
-                    child: Text('Nothing Found'),
+                    child: const Text('Nothing Found'),
                   )
             : Column(
               children: [
@@ -114,7 +114,7 @@ class _SearchState extends State<Search> {
                     },
                   ),
                 ),
-                Text('Please Select a Language to Search'),
+                const Text('Please Select a Language to Search'),
               ]));
   }
 }

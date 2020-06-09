@@ -10,29 +10,29 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
-  Future<double> fontSize;
-  Future<int> lang;
+  Future<double> _fontSize;
+  Future<int> _lang;
   double _value;
   int _val;
   @override
   void initState() {
     super.initState();
-    fontSize = getFont().then((value) => _value=value);
-    lang = getLang().then((value) => _val = value);
+    _fontSize = getFont().then((value) => _value=value);
+    _lang = getLang().then((value) => _val = value);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title:const Text(
           'Settings',
           textAlign: TextAlign.center,
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
       body: FutureBuilder(
-          future: Future.wait([fontSize, lang]),
+          future: Future.wait([_fontSize, _lang]),
           builder: (ctx, snapshot) {
             if (!snapshot.hasData) {
               return Center(child: CircularProgressIndicator());
@@ -43,7 +43,7 @@ class _SettingsState extends State<Settings> {
                 ExpansionTile(
                     title: Center(
                       child: ListTile(
-                        title: Text('Font Size'),
+                        title: const Text('Font Size'),
                         trailing: Text(_value.round().toString()),
                       ),
                     ),
@@ -63,16 +63,16 @@ class _SettingsState extends State<Settings> {
                                Navigator.of(context).pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false)
                             });
                           },
-                          child: Text('Save')),
+                          child: const Text('Save')),
                     ]),
                 Center(
                   child: ListTile(
-                      title: Text("Language"),
+                      title: const Text("Language"),
                       trailing: DropdownButton<int>(
                           value: _val,
                           items: [
-                            DropdownMenuItem(child: Text('Nepali'), value: 0),
-                            DropdownMenuItem(child: Text('English'), value: 1)
+                            DropdownMenuItem(child: const Text('Nepali'), value: 0),
+                            DropdownMenuItem(child: const Text('English'), value: 1)
                           ],
                           onChanged: (val) async {
                             if (val != null) {
@@ -83,15 +83,10 @@ class _SettingsState extends State<Settings> {
                 ),
                 InkWell(
                   child: ListTile(
-                    title: Text('Download Audios'),
+                    title: const Text('Download Audios'),
                   ),
                   onTap: ()=>Navigator.of(context).pushNamed('/audio'),
                 ),
-                // TextField(
-                //   onSubmitted: (str){
-                //     print(str);
-                //   },
-                // ),
               ],
             );
           }),

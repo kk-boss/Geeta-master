@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-// import '../book.dart';
 import '../widgets/verse.dart';
 import '../providers/data.dart';
 import '../controllers/sharedprefs.dart';
@@ -13,7 +12,7 @@ class Bookmarks extends StatelessWidget {
     final getBook = dataProvider.getBookmark();
     final lang = getLang();
     return Scaffold(
-      appBar: AppBar(title: Text('Bookmarks')),
+      appBar: AppBar(title: const Text('Bookmarks')),
       body: FutureBuilder(
           future: Future.wait([getBook, lang]),
           builder: (ctx, snapsot) {
@@ -25,7 +24,7 @@ class Bookmarks extends StatelessWidget {
             final snapshot = snapsot.data[0];
             if (snapshot.length == 0) {
               return Center(
-                child: Text('No Bookmarks'),
+                child: const Text('No Bookmarks'),
               );
             }
             final items = snapshot;
@@ -65,7 +64,7 @@ class Bookmarks extends StatelessWidget {
                         children: <Widget>[
                           Padding(
                             padding: const EdgeInsets.only(right: 8.0),
-                            child: Text(
+                            child: const Text(
                               'Delete',
                               style: TextStyle(color: Colors.white),
                             ),
@@ -88,7 +87,7 @@ class Bookmarks extends StatelessWidget {
                         children: <Widget>[
                           Padding(
                             padding: const EdgeInsets.only(right: 8.0),
-                            child: Text(
+                            child: const Text(
                               'Delete',
                               style: TextStyle(color: Colors.white),
                             ),

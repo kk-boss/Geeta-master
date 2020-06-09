@@ -76,18 +76,4 @@ class Download with ChangeNotifier {
     }
     await db.close();
   }
-
-  Future<List<Audio>> getAudioData() async {
-    final Future<Database> database =
-        openDatabase(Path.join(await getDatabasesPath(), 'audio.db'));
-    final Database db = await database;
-    final List<Map<String, dynamic>> maps = await db.query('audio');
-    await db.close();
-    return List.generate(maps.length, (i) {
-      return Audio(
-        chapter: maps[i]['chapter'],
-        download: maps[i]['download'],
-      );
-    });
-  }
 }

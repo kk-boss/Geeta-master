@@ -52,7 +52,7 @@ class Verse extends StatelessWidget {
                     onPressed: () {
                       Navigator.of(context).pushNamed('/audio');
                     },
-                    child: Text('Download Audio')),
+                    child: const Text('Download Audio')),
         ],
       ),
     );

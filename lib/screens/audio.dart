@@ -21,22 +21,18 @@ class _AudioDownloadState extends State<AudioDownload> {
     InterstitialAd createInterstitialAd() {
     return InterstitialAd(
       adUnitId: InterstitialAd.testAdUnitId,
-      listener: (MobileAdEvent event) {
-        print("InterstitialAd event $event");
-      },
     );
   }
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () {
-        print('wilPop');
         return showDialog(
           context: context,
           builder: (context) {
             return AlertDialog(
-              title: Text('Are you sure to exit?'),
-              content: Text(
+              title: const Text('Are you sure to exit?'),
+              content: const Text(
                 'Ongoing downloads will be stopped',
                 textAlign: TextAlign.center,
               ),
@@ -45,14 +41,14 @@ class _AudioDownloadState extends State<AudioDownload> {
                     onPressed: () {
                       Navigator.of(context).pop(true);
                     },
-                    child: Text(
+                    child: const Text(
                       'Exit',
                     )),
                 FlatButton(
                     onPressed: () {
                       Navigator.of(context).pop(false);
                     },
-                    child: Text(
+                    child: const Text(
                       'Stay',
                     )),
               ],
@@ -62,7 +58,7 @@ class _AudioDownloadState extends State<AudioDownload> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Audio List'),
+          title: const Text('Audio List'),
           actions: <Widget>[
             FlatButton(
               onPressed: () async {
@@ -71,7 +67,7 @@ class _AudioDownloadState extends State<AudioDownload> {
                 Navigator.of(context)
                     .pushNamedAndRemoveUntil('/', (route) => false);
               },
-              child: Text('Reload App'),
+              child: const Text('Reload App'),
             ),
           ],
         ),

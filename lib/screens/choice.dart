@@ -3,39 +3,31 @@ import 'package:flutter/material.dart';
 import '../models/book.dart';
 
 class ChoiceScreen extends StatefulWidget {
-  static const String routeName = '/choice';
 
   @override
   _ChoiceScreenState createState() => _ChoiceScreenState();
 }
 
-class Modeel {
-  final int id;
-  final int chapter;
-
-  Modeel({this.id, this.chapter});
-}
-
 class _ChoiceScreenState extends State<ChoiceScreen> {
-  int chapterCount = 0;
-  int id = 0;
-  bool firstRun = true;
-  int initialIndex = 0;
+  int _chapterCount = 0;
+  int _id = 0;
+  bool _firstRun = true;
+  int _initialIndex = 0;
   @override
   void initState() {
     super.initState();  
   }
   @override
   void didChangeDependencies() {
-    if (firstRun) {
+    if (_firstRun) {
       var routeArgs =
           ModalRoute.of(context).settings.arguments as Map<String, int>;
       if (routeArgs != null) {
-        id = routeArgs["id"];
-        chapterCount = BOOK.where((test) => test.id == id).toList()[0].chapter;
-        initialIndex = 1;
+        _id = routeArgs["_id"];
+        _chapterCount = BOOK.where((test) => test.id == _id).toList()[0].chapter;
+        _initialIndex = 1;
       }
-      firstRun = false;
+      _firstRun = false;
     }
     super.didChangeDependencies();
   }
@@ -44,17 +36,17 @@ class _ChoiceScreenState extends State<ChoiceScreen> {
     return Scaffold(
       body: DefaultTabController(
         length: 2,
-        initialIndex: initialIndex,
+        initialIndex: _initialIndex,
         child: Scaffold(
           appBar: AppBar(
-            title: Text('Geeta'),
+            title: const Text('Geeta'),
             bottom: TabBar(
               tabs: [
                 Tab(
-                  child: Text('Book'),
+                  child: const Text('Book'),
                 ),
                 Tab(
-                  child: Text('Chapter'),
+                  child: const Text('Chapter'),
                 ),
               ],
             ),
@@ -74,7 +66,7 @@ class _ChoiceScreenState extends State<ChoiceScreen> {
                   crossAxisSpacing: 10,
                   mainAxisSpacing: 10,
                 ),
-                itemCount: chapterCount,
+                itemCount: _chapterCount,
                 itemBuilder: (ctx, i) {
                   return InkWell(
                     child: Container(
@@ -91,7 +83,7 @@ class _ChoiceScreenState extends State<ChoiceScreen> {
                           '/', (Route<dynamic> route) => false,
                           arguments: {
                             'chapter': i,
-                            'id': id,
+                            '_id': _id,
                           });
                     },
                   );
@@ -107,14 +99,14 @@ class _ChoiceScreenState extends State<ChoiceScreen> {
   Widget buildListTile(BuildContext ctx, List book) {
     return InkWell(
       child: ListTile(
-        leading: Text((book[0].id).toString()),
+        leading: Text((book[0]._id).toString()),
         title: Text(book[0].title),
       ),
       onTap: () {
         DefaultTabController.of(ctx).animateTo(1);
         setState(() {
-          chapterCount = book[0].chapter;
-          id = book[0].id;
+          _chapterCount = book[0].chapter;
+          _id = book[0]._id;
         });
       },
     );

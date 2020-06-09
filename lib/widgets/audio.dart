@@ -126,7 +126,7 @@ class _AudioListState extends State<AudioList> {
                         context: context,
                         builder: (context) {
                           return AlertDialog(
-                            title: Text('Are you sure?'),
+                            title: const Text('Are you sure?'),
                             content: Text(
                                 'Audios of chapter ${widget.index + 1} will be deleted.'),
                             actions: <Widget>[
@@ -146,16 +146,16 @@ class _AudioListState extends State<AudioList> {
                                         _isdownload = 0;
                                       });
                                     }).catchError((onError) {
-                                      print('error');
+                                      Scaffold.of(context).showSnackBar(SnackBar(content: const Text('An error occured'),));
                                     });
                                     Navigator.of(context).pop();
                                   },
-                                  child: Text('Yes')),
+                                  child: const Text('Yes')),
                               FlatButton(
                                   onPressed: () {
                                     Navigator.of(context).pop();
                                   },
-                                  child: Text('No')),
+                                  child: const Text('No')),
                             ],
                           );
                         },
@@ -179,7 +179,6 @@ class _AudioListState extends State<AudioList> {
                               await download(uri[widget.index]);
                             }
                           : null)
-                  // : IconButton(icon: Icon(Icons.check), onPressed: () {}),
             ],
           ),
         ],
@@ -208,7 +207,7 @@ class _AudioListState extends State<AudioList> {
       case 2:
         return Row(
           children: <Widget>[
-            Text('Extracting.. Please wait..'),
+            const Text('Extracting..'),
             CircularProgressIndicator(),
           ],
         );

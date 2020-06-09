@@ -17,7 +17,6 @@ import './screens/about-us.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Admob.initialize(getAppId());
   FirebaseAdMob.instance.initialize(appId: FirebaseAdMob.testAppId);
   runApp(MyApp());
 }

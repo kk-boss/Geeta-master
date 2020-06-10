@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share/share.dart';
@@ -32,10 +35,14 @@ class _HomePageState extends State<HomePage> {
   Future<List<Audio>> _audio;
   var _scaffoldKey = GlobalKey<ScaffoldState>();
   bool _isFirstInit = true;
+  Timer _timer;
+  InterstitialAd _interstitialAd;
 
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {restoreState();});
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      restoreState();
+    });
     super.initState();
     _copyAudio = Download.copyAudioData().then((onValue) {
       _audio = Download.getData();
@@ -47,20 +54,33 @@ class _HomePageState extends State<HomePage> {
     });
     _lang = getLang();
     _font = getFont();
+    _interstitialAd = InterstitialAd(
+      adUnitId: interId,
+      listener: (event) {
+        if(event == MobileAdEvent.failedToLoad){
+         print(event);
+        }
+      },
+    );
+     _timer = Timer.periodic(Duration(minutes: 15), (timer) {
+       _interstitialAd..load()..show().catchError((onError){
+         print('Error occured');
+       });
+    });
   }
 
   Future<void> restoreState() async {
-    var _routeArgs = ModalRoute.of(context).settings.arguments as Map<String,int>;
+    var _routeArgs =
+        ModalRoute.of(context).settings.arguments as Map<String, int>;
     List<int> restore = await getSavedState();
-    int _id = restore[0];
-    int _chapter = restore[1];
-    if (_id != null && _chapter != null && _routeArgs == null) {
-      print("$_id  $_chapter");
-      _id = _id;
-      _currentPage = _chapter;
+    int id = restore[0];
+    int chapter = restore[1];
+    if (id != null && chapter != null && _routeArgs == null) {
+      _id = id;
+      _currentPage = chapter;
       _controller = PageController(initialPage: _currentPage);
       setState(() {
-        _geeta = DataProvider.getData(_id, _currentPage+1);
+        _geeta = DataProvider.getData(_id, _currentPage + 1);
       });
     }
   }
@@ -72,7 +92,7 @@ class _HomePageState extends State<HomePage> {
           ModalRoute.of(context).settings.arguments as Map<String, int>;
       if (routeArgs != null) {
         _currentPage = routeArgs['chapter'] ?? 0;
-        _id = routeArgs['_id'] ?? 7;
+        _id = routeArgs['id'] ?? 7;
         _controller = PageController(initialPage: _currentPage);
         setBookId(_id);
         setChapter(_currentPage);
@@ -81,13 +101,22 @@ class _HomePageState extends State<HomePage> {
     }
     super.didChangeDependencies();
   }
+
+  @override
+  void dispose() { 
+    _interstitialAd.dispose();
+    _timer.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final MediaQueryData mediaquery = MediaQuery.of(context);
     final selectionProvider = Provider.of<Selection>(context);
     final dataProvider = Provider.of<DataProvider>(context);
     final String title = BOOK.where((test) => test.id == _id).toList()[0].title;
-    final int chapter = BOOK.where((test) => test.id == _id).toList()[0].chapter;
+    final int chapter =
+        BOOK.where((test) => test.id == _id).toList()[0].chapter;
     return Scaffold(
         key: _scaffoldKey,
         appBar: !selectionProvider.verses.contains(true)
@@ -104,8 +133,8 @@ class _HomePageState extends State<HomePage> {
                                 _controller.jumpToPage(_currentPage - 1);
                                 _geeta =
                                     DataProvider.getData(_id, _currentPage + 1);
-                               await setBookId(_id);
-                               await setChapter(_currentPage);
+                                await setBookId(_id);
+                                await setChapter(_currentPage);
                               }
                             : null,
                       ),
@@ -140,13 +169,13 @@ class _HomePageState extends State<HomePage> {
                           height: kToolbarHeight / 1.5,
                           decoration: BoxDecoration(
                               color: Color.fromRGBO(31, 32, 122, 1)),
-                          child:
-                              Center(child: Text((_currentPage + 1).toString())),
+                          child: Center(
+                              child: Text((_currentPage + 1).toString())),
                         ),
                         onTap: () {
                           Navigator.of(context).pushNamed('/choice',
                               arguments: {
-                                '_id': _id,
+                                'id': _id,
                                 'chapter': _currentPage + 1
                               });
                         },
@@ -160,8 +189,8 @@ class _HomePageState extends State<HomePage> {
                                 _controller.jumpToPage(_currentPage + 1);
                                 _geeta =
                                     DataProvider.getData(_id, _currentPage + 1);
-                               await setBookId(_id);
-                               await setChapter(_currentPage);
+                                await setBookId(_id);
+                                await setChapter(_currentPage);
                               }
                             : null,
                       ),
@@ -211,7 +240,7 @@ class _HomePageState extends State<HomePage> {
                               content: Text(
                                   selectionProvider.list.length.toString() +
                                       addedToBookmarks),
-                                      behavior: SnackBarBehavior.floating,
+                              behavior: SnackBarBehavior.floating,
                             ));
                             selectionProvider.clear();
                           },
@@ -275,17 +304,17 @@ class _HomePageState extends State<HomePage> {
                             selectionProvider.add(snapshot.length);
                             return Column(
                               children: <Widget>[
-                                if(_id==7)
-                                Container(
-                                  width: double.infinity,
-                                  color: Colors.grey,
-                                  child: Text(
-                                  TITLE[j],
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: snapsot.data[1]),
-                                )),
+                                if (_id == 7)
+                                  Container(
+                                      width: double.infinity,
+                                      color: Colors.grey,
+                                      child: Text(
+                                        TITLE[j],
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: snapsot.data[1]),
+                                      )),
                                 Expanded(
                                   child: ListView.builder(
                                     itemCount: snapshot.length,

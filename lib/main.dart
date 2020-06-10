@@ -11,13 +11,14 @@ import './screens/audio.dart';
 import './providers/audio.dart';
 import './providers/selection.dart';
 import './providers/data.dart';
-import './providers/download.dart';
 import './screens/about-app.dart';
 import './screens/about-us.dart';
+import './providers/download.dart';
+import './util/strings.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  FirebaseAdMob.instance.initialize(appId: FirebaseAdMob.testAppId);
+  FirebaseAdMob.instance.initialize(appId: appId);
   runApp(MyApp());
 }
 
@@ -36,10 +37,9 @@ class _MyAppState extends State<MyApp> {
   }
   BannerAd createBannerAd() {
     return BannerAd(
-      adUnitId: BannerAd.testAdUnitId,
+      adUnitId: bannerId,
       size: AdSize.banner,
       listener: (MobileAdEvent event) {
-        print("BannerAd event $event");
         if(event==MobileAdEvent.failedToLoad){
           if(_bottomPadding!=0.0)
           setState(() {

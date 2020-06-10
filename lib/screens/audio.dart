@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../widgets/audio.dart';
 import '../providers/download.dart';
+import '../util/strings.dart';
 
 class AudioDownload extends StatefulWidget {
   @override
@@ -18,11 +19,13 @@ class _AudioDownloadState extends State<AudioDownload> {
     _audio = Download.getData();
     _interstitialAd = createInterstitialAd();
   }
-    InterstitialAd createInterstitialAd() {
+
+  InterstitialAd createInterstitialAd() {
     return InterstitialAd(
-      adUnitId: InterstitialAd.testAdUnitId,
+      adUnitId: interId,
     );
   }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(

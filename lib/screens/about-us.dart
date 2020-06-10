@@ -24,7 +24,7 @@ class AboutUs extends StatelessWidget {
             Image.asset('assets/santosh.jpg',fit: BoxFit.cover),
             Divider(),
              const Text(
-              'Santosh Thapa',
+              'Santosh Thapa Magar',
               style: const TextStyle(
                   fontWeight: FontWeight.bold, color: Colors.blue),
               softWrap: true,

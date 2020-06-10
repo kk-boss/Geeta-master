@@ -2,9 +2,10 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:archive/archive.dart';
+import 'package:archive/archive_io.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:flutter_archive/flutter_archive.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:http/http.dart' as http;
 
@@ -78,27 +79,45 @@ class _AudioListState extends State<AudioList> {
           });
         },
         cancelOnError: true,
-        onError: (){
-          print('Stream error');
-        },
       );
     });
   }
 
-  Future<void> unZip(File file, String dir) async {
-    final destPath = Directory('$dir/audio/');
-    print(destPath);
-    try {
-      FlutterArchive.unzip(zipFile: file, destinationDir: destPath).then((_) {
-        Download.updateAudio(widget.chapter, true);
+  // Future<void> unZip(File file, String dir) async {
+  //   final destPath = Directory('$dir/audio/');
+  //   print(destPath);
+  //   try {
+  //     FlutterArchive.unzip(zipFile: file, destinationDir: destPath).then((_) {
+  //       Download.updateAudio(widget.chapter, true);
+  //       file.deleteSync(recursive: true);
+  //       setState(() {
+  //         _download = 3;
+  //       });
+  //     });
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  // }
+    Future<void> unZip(File file, String dir) async {
+    final bytes = file.readAsBytesSync();
+    final archive = ZipDecoder().decodeBytes(bytes);
+    for (final file in archive) {
+      final filename = file.name;
+      print(file.isFile);
+      if (file.isFile) {
+        final data = file.content as List<int>;
+        File('$dir/audio/' + filename)
+          ..createSync(recursive: true)
+          ..writeAsBytesSync(data);
+      } else {
+        Directory('$dir/audio/' + filename)..create(recursive: true);
+      }
+    }
+     await Download.updateAudio(widget.chapter, true);
         file.deleteSync(recursive: true);
         setState(() {
           _download = 3;
         });
-      });
-    } catch (e) {
-      print(e);
-    }
   }
 
   @override

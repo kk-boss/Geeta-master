@@ -23,7 +23,7 @@ class _ChoiceScreenState extends State<ChoiceScreen> {
       var routeArgs =
           ModalRoute.of(context).settings.arguments as Map<String, int>;
       if (routeArgs != null) {
-        _id = routeArgs["_id"];
+        _id = routeArgs["id"];
         _chapterCount = BOOK.where((test) => test.id == _id).toList()[0].chapter;
         _initialIndex = 1;
       }
@@ -83,7 +83,7 @@ class _ChoiceScreenState extends State<ChoiceScreen> {
                           '/', (Route<dynamic> route) => false,
                           arguments: {
                             'chapter': i,
-                            '_id': _id,
+                            'id': _id,
                           });
                     },
                   );
@@ -99,14 +99,14 @@ class _ChoiceScreenState extends State<ChoiceScreen> {
   Widget buildListTile(BuildContext ctx, List book) {
     return InkWell(
       child: ListTile(
-        leading: Text((book[0]._id).toString()),
+        leading: Text((book[0].id).toString()),
         title: Text(book[0].title),
       ),
       onTap: () {
         DefaultTabController.of(ctx).animateTo(1);
         setState(() {
           _chapterCount = book[0].chapter;
-          _id = book[0]._id;
+          _id = book[0].id;
         });
       },
     );

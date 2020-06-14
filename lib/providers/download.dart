@@ -20,6 +20,11 @@ class Audio {
 }
 
 class Download with ChangeNotifier {
+  static Future<Database> initDatabase()async {
+    return openDatabase(
+      Path.join(await getDatabasesPath(), 'audio.db'),
+    );
+  }
   static Future<bool> copyAudioData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     int isDbinserted = prefs.getInt("isAudioCreated");
@@ -36,16 +41,7 @@ class Download with ChangeNotifier {
   }
 
   static Future<List<Audio>> getData() async {
-    final Future<Database> database = openDatabase(
-      Path.join(await getDatabasesPath(), 'audio.db'),
-      onCreate: (db, version) {
-        return db.execute(
-          'CREATE TABLE IF NOT EXISTS "audio" (	"id"	INTEGER, "chapter" INTEGER,	"download"	INTEGER DEFAULT 0,	PRIMARY KEY("id"))',
-        );
-      },
-      version: 1,
-    );
-    final Database db = await database;
+    final Database db = await initDatabase();
     final List<Map<String, dynamic>> maps = await db.query('audio');
     await db.close();
     return List.generate(maps.length, (i) {
@@ -57,16 +53,7 @@ class Download with ChangeNotifier {
   }
 
   static Future<void> updateAudio(int chapter, bool type) async {
-    final Future<Database> database = openDatabase(
-      Path.join(await getDatabasesPath(), 'audio.db'),
-      onCreate: (db, version) {
-        return db.execute(
-          'CREATE TABLE IF NOT EXISTS "audio" (	"id"	INTEGER, "chapter" INTEGER,	"download"	INTEGER DEFAULT 0,	PRIMARY KEY("id"))',
-        );
-      },
-      version: 1,
-    );
-    final Database db = await database;
+    final Database db = await initDatabase();
     if (type) {
       await db.update('audio', {'download': 1},
           where: 'chapter=?', whereArgs: [chapter]);

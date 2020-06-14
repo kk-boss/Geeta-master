@@ -13,10 +13,10 @@ class Selection with ChangeNotifier {
     if(!_selection.remove('$sanskrit\n$translation\n')){
       _selection.insert(i, '$sanskrit\n$translation\n');
     }
-    if (_textColor[i] == Colors.white) {
+    if (_textColor[i] == Colors.red) {
       _textColor[i] = Colors.grey[400];
     } else {
-      _textColor[i] = Colors.white;
+      _textColor[i] = Colors.red;
     }
     if(!_list.remove(i+1)){
       _list.add(i + 1);
@@ -28,7 +28,7 @@ class Selection with ChangeNotifier {
   void add(int length) {
     for (var i = 0; i < length; i++) {
       _verses.add(false);
-      _textColor.add(Colors.white);
+      _textColor.add(Colors.red);
       _selection.add('');
     }
   }

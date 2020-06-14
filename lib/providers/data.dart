@@ -10,21 +10,16 @@ import '../util/database.dart';
 class DataProvider with ChangeNotifier {
   int _result = 0;
   int get result => _result;
-  Future<List<Geeta>> get fetchBookmark => getBookmark();
-  Future<Database> database() async {
+  static Future<Database> initDatabase() async {
     return openDatabase(
       Path.join(await getDatabasesPath(), 'geeta.db'),
     );
   }
 
   static Future<List<Geeta>> getData(int book, int chapter) async {
-    final Future<Database> database = openDatabase(
-      Path.join(await getDatabasesPath(), 'geeta.db'),
-    );
-    final Database db = await database;
+    final Database db = await initDatabase();
     final List<Map<String, dynamic>> maps = await db.query('geeta',
         where: 'book=? and chapter=?', whereArgs: [book, chapter]);
-    // await db.close();
     return List.generate(maps.length, (i) {
       return Geeta(
           book: maps[i]['book'],
@@ -36,45 +31,6 @@ class DataProvider with ChangeNotifier {
           color: maps[i]['color']);
     });
   }
-
-  Future<void> addBookmarks(int id, int chapter, List<int> verses) async {
-    final Future<Database> database = this.database();
-    final Database db = await database;
-    for (var verse in verses) {
-      await db.update('geeta', {'isBookmark': 1},
-          where: 'book=? and chapter=? and verse=?',
-          whereArgs: [id, chapter, verse]);
-    }
-    await db.close();
-  }
-
-  Future<List<Geeta>> getBookmark() async {
-    final Future<Database> database = this.database();
-    final Database db = await database;
-    final List<Map<String, dynamic>> maps =
-        await db.query('geeta', where: 'isBookmark=?', whereArgs: [1]);
-    await db.close();
-    return List.generate(maps.length, (i) {
-      return Geeta(
-          book: maps[i]['book'],
-          chapter: maps[i]['chapter'],
-          verse: maps[i]['verse'],
-          sanskrit: maps[i]['sanskrit'],
-          nepali: maps[i]['nepali'],
-          english: maps[i]['english'],
-          color: maps[i]['color']);
-    });
-  }
-
-  Future<void> delBookmark(int chapter, int verse) async {
-    final Future<Database> database = this.database();
-    final Database db = await database;
-    await db.update('geeta', {'isBookmark': 0},
-        where: 'chapter=? and verse=?', whereArgs: [chapter, verse]);
-    await db.close();
-    notifyListeners();
-  }
-
   static Future<bool> copyData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     int isDbinserted = prefs.getInt("database");
@@ -94,8 +50,7 @@ class DataProvider with ChangeNotifier {
   }
 
   Future<void> setColor(int color, int chapter, List<int> verses) async {
-    final Future<Database> database = this.database();
-    final Database db = await database;
+    final Database db = await initDatabase();
     for (var verse in verses) {
       await db.update('geeta', {'color': color},
           where: 'chapter=? and verse=?', whereArgs: [chapter, verse]);
@@ -111,15 +66,14 @@ class SearchProvider with ChangeNotifier {
   bool _isSearchPressed = false;
   List<Geeta> get lists => _lists;
   bool get isSearchPressed => _isSearchPressed;
-  Future<Database> database() async {
+  static Future<Database> initDatabase() async {
     return openDatabase(
       Path.join(await getDatabasesPath(), 'geeta.db'),
     );
   }
 
   Future<void> searchData(String text, int val) async {
-    final Future<Database> database = this.database();
-    final Database db = await database;
+    final Database db = await initDatabase();
     final List<Map<String, dynamic>> maps = await db
         .rawQuery('SELECT * FROM geeta WHERE ${lang[val]} LIKE ?', ['%$text%']);
     await db.close();

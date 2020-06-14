@@ -32,7 +32,22 @@ class AboutUs extends StatelessWidget {
             ),
             Divider(),
             const Text(
-              'Contact:',
+              'Audio Recorded By:',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            Divider(),
+            Image.asset('assets/aashish.jpg',fit: BoxFit.cover),
+            Divider(),
+             const Text(
+              'Aashish Pathak',
+              style: const TextStyle(
+                  fontWeight: FontWeight.bold, color: Colors.blue),
+              softWrap: true,
+              textAlign: TextAlign.center,
+            ),
+            Divider(),
+            const Text(
+              'Contact Us:',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             Divider(),
@@ -81,7 +96,7 @@ class AboutUs extends StatelessWidget {
             ),
             Divider(),
             const Text(
-              'Mani Kashyap \n\nAmrit Giri \n\nAshish Pathak \n\nSandip Khanal \n\nYubraj Shrestha \n\nAbhisek Joshi \n\nSantosh Aryal \n\nKrishna Gyawali\n\n',
+              'Mani Kashyap \n\nAmrit Giri \n\nMin Bishwakarma \n\nSandip Khanal \n\nYubraj Shrestha \n\nAbhisek Joshi \n\nSantosh Aryal \n\nKrishna Gyawali\n\n',
               textAlign: TextAlign.center,
             ),
           ],

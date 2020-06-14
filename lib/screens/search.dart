@@ -35,11 +35,12 @@ class _SearchState extends State<Search> {
                 SafeArea(
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.blue,
+                  color: Theme.of(context).primaryColor,
                 ),
                 child: Container(
                   decoration: BoxDecoration(
-                      color: Colors.tealAccent,
+                      // color: Colors.tealAccent,
+                      color: Theme.of(context).accentColor,
                       borderRadius: BorderRadius.circular(35)),
                   child: ListTile(
                       leading: IconButton(
@@ -79,9 +80,9 @@ class _SearchState extends State<Search> {
                     itemCount: lists.length,
                     itemBuilder: (ctx, i) {
                       if (_val == 2) {
-                        return Verse(geeta: lists[i],translation: lists[i].english,fontSize: 18,textColor: Colors.white,);
+                        return Verse(geeta: lists[i],translation: lists[i].english,fontSize: 18,textColor: Colors.white,showAudio: false,);
                       }
-                      return Verse(geeta: lists[i],translation: lists[i].nepali,fontSize: 18,textColor: Colors.white,);
+                      return Verse(geeta: lists[i],translation: lists[i].nepali,fontSize: 18,textColor: Colors.white,showAudio: false,);
                     })
                 : Center(
                     child: const Text('Nothing Found'),

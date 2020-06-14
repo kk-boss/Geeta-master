@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import '../controllers/sharedprefs.dart';
+import '../providers/font.dart';
+import '../providers/language.dart';
 
 class Settings extends StatefulWidget {
   Settings({Key key}) : super(key: key);
@@ -10,86 +13,86 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
-  Future<double> _fontSize;
-  Future<int> _lang;
-  double _value;
-  int _val;
   @override
   void initState() {
     super.initState();
-    _fontSize = getFont().then((value) => _value=value);
-    _lang = getLang().then((value) => _val = value);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title:const Text(
+        title: const Text(
           'Settings',
           textAlign: TextAlign.center,
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
-      body: FutureBuilder(
-          future: Future.wait([_fontSize, _lang]),
-          builder: (ctx, snapshot) {
-            if (!snapshot.hasData) {
-              return Center(child: CircularProgressIndicator());
-            }
-            return Column(
+      body:Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                ExpansionTile(
-                    title: Center(
-                      child: ListTile(
-                        title: const Text('Font Size'),
-                        trailing: Text(_value.round().toString()),
+                Consumer<FontManager>(builder: (context, manager, _) {
+                  return ExpansionTile(
+                      title: Center(
+                        child: ListTile(
+                          title: const Text('Font Size'),
+                          trailing: Text(manager.fontSize.round().toString()),
+                        ),
                       ),
-                    ),
-                    children: [
-                      Slider(
-                          value: _value,
-                          min: 5.0,
-                          max: 25.0,
-                          onChanged: (double val) async {
-                            setState(() {
-                              _value = val;
-                            });
-                          }),
-                      RaisedButton(
-                          onPressed: () async {
-                            await setFont(_value).then((_) => {
-                               Navigator.of(context).pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false)
-                            });
-                          },
-                          child: const Text('Save')),
-                    ]),
-                Center(
-                  child: ListTile(
-                      title: const Text("Language"),
-                      trailing: DropdownButton<int>(
-                          value: _val,
-                          items: [
-                            DropdownMenuItem(child: const Text('Nepali'), value: 0),
-                            DropdownMenuItem(child: const Text('English'), value: 1)
-                          ],
-                          onChanged: (val) async {
-                            if (val != null) {
-                             await setLang(val);
-                            Navigator.of(context).pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
-                            }
-                          })),
+                      children: [
+                        Slider(
+                            value: manager.fontSize,
+                            min: 5.0,
+                            max: 25.0,
+                            onChanged: (double val) async {
+                              await manager.setFont(val);
+                            }),
+                      ]);
+                }),
+                Consumer<LanguageManager>(
+                  builder: (context, manager,_) {
+                    return ListTile(
+                        title: const Text("Language"),
+                        trailing: DropdownButton<int>(
+                            value: manager.language,
+                            items: [
+                              DropdownMenuItem(
+                                  child: const Text('Nepali'), value: 0),
+                              DropdownMenuItem(
+                                  child: const Text('English'), value: 1)
+                            ],
+                            onChanged: (val) async {
+                              if (val != null) {
+                                await manager.setLanguage(val);
+                                // Navigator.of(context).pushNamedAndRemoveUntil(
+                                //     '/', (Route<dynamic> route) => false);
+                              }
+                            }));
+                  }
                 ),
                 InkWell(
                   child: ListTile(
                     title: const Text('Download Audios'),
                   ),
-                  onTap: ()=>Navigator.of(context).pushNamed('/audio'),
+                  onTap: () => Navigator.of(context).pushNamed('/audio'),
+                ),
+                ListTile(
+                  onTap: () {
+                    Navigator.of(context).pushNamed('/theme');
+                  },
+                  title: const Text('Change Theme'),
+                ),
+                ListTile(
+                  onTap: () {
+                   SharedPreferences.getInstance().then((prefs) {
+                      prefs.remove("lang_preference").then((value) => print("removed"));
+                   });
+                  },
+                  title: const Text('Change Font'),
                 ),
               ],
-            );
-          }),
+            ),
+         
     );
   }
 }

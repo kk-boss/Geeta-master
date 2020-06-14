@@ -1,6 +1,7 @@
 import 'dart:async';
 
-import 'package:firebase_admob/firebase_admob.dart';
+// import 'package:firebase_admob/firebase_admob.dart';
+import 'package:Bhagavad_Gita/providers/font.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share/share.dart';
@@ -16,7 +17,10 @@ import '../providers/selection.dart';
 import '../providers/data.dart';
 import '../providers/download.dart';
 import '../widgets/progress.dart';
+import '../widgets/title.dart';
 import '../util/strings.dart';
+import '../providers/language.dart';
+import '../providers/bookmarks.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -28,15 +32,12 @@ class _HomePageState extends State<HomePage> {
   int _id = 7;
   PageController _controller = new PageController();
   Future<bool> _copy;
-  Future<double> _font;
   Future<List<Geeta>> _geeta;
-  Future<int> _lang;
   Future<bool> _copyAudio;
   Future<List<Audio>> _audio;
   var _scaffoldKey = GlobalKey<ScaffoldState>();
   bool _isFirstInit = true;
-  Timer _timer;
-  InterstitialAd _interstitialAd;
+  DateTime currentBackPressTime;
 
   @override
   void initState() {
@@ -51,21 +52,6 @@ class _HomePageState extends State<HomePage> {
     _copy = DataProvider.copyData().then((onValue) {
       _geeta = DataProvider.getData(_id, _currentPage + 1);
       return onValue;
-    });
-    _lang = getLang();
-    _font = getFont();
-    _interstitialAd = InterstitialAd(
-      adUnitId: interId,
-      listener: (event) {
-        if(event == MobileAdEvent.failedToLoad){
-         print(event);
-        }
-      },
-    );
-     _timer = Timer.periodic(Duration(minutes: 15), (timer) {
-       _interstitialAd..load()..show().catchError((onError){
-         print('Error occured');
-       });
     });
   }
 
@@ -103,21 +89,28 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
-  void dispose() { 
-    _interstitialAd.dispose();
-    _timer.cancel();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final MediaQueryData mediaquery = MediaQuery.of(context);
     final selectionProvider = Provider.of<Selection>(context);
-    final dataProvider = Provider.of<DataProvider>(context);
     final String title = BOOK.where((test) => test.id == _id).toList()[0].title;
     final int chapter =
         BOOK.where((test) => test.id == _id).toList()[0].chapter;
-    return Scaffold(
+    return WillPopScope(
+      onWillPop: () {
+        DateTime now = DateTime.now();
+        if (currentBackPressTime == null ||
+            now.difference(currentBackPressTime) > Duration(seconds: 2)) {
+          currentBackPressTime = now;
+          _scaffoldKey.currentState
+            ..hideCurrentSnackBar()
+            ..showSnackBar(SnackBar(
+              content: Text('Press back again to exit'),
+            ));
+          return Future.value(false);
+        }
+        return Future.value(true);
+      },
+      child: Scaffold(
         key: _scaffoldKey,
         appBar: !selectionProvider.verses.contains(true)
             ? AppBar(
@@ -126,6 +119,7 @@ class _HomePageState extends State<HomePage> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
                     Flexible(
+                      flex: 4,
                       child: IconButton(
                         icon: Icon(Icons.arrow_back_ios),
                         onPressed: (_currentPage > 0)
@@ -139,49 +133,18 @@ class _HomePageState extends State<HomePage> {
                             : null,
                       ),
                     ),
+                    Spacer(),
+                    Flexible(
+                      flex: 20,
+                      child: BookTitle(title: title),
+                    ),
+                    Spacer(),
                     Flexible(
                       flex: 4,
-                      child: InkWell(
-                        child: Container(
-                          height: kToolbarHeight / 1.5,
-                          decoration: BoxDecoration(
-                              color: Color.fromRGBO(31, 32, 122, 1)),
-                          child: Center(
-                            child: Tooltip(
-                              message: title,
-                              child: Text(
-                                title,
-                                textAlign: TextAlign.center,
-                                overflow: TextOverflow.fade,
-                              ),
-                            ),
-                          ),
-                        ),
-                        onTap: () {
-                          Navigator.of(context).pushNamed('/choice');
-                        },
-                      ),
+                      child: ChapterNumber(currentPage: _currentPage, id: _id),
                     ),
                     Flexible(
-                      child: InkWell(
-                        child: Container(
-                          width: kToolbarHeight / 1.5,
-                          height: kToolbarHeight / 1.5,
-                          decoration: BoxDecoration(
-                              color: Color.fromRGBO(31, 32, 122, 1)),
-                          child: Center(
-                              child: Text((_currentPage + 1).toString())),
-                        ),
-                        onTap: () {
-                          Navigator.of(context).pushNamed('/choice',
-                              arguments: {
-                                'id': _id,
-                                'chapter': _currentPage + 1
-                              });
-                        },
-                      ),
-                    ),
-                    Flexible(
+                      flex: 4,
                       child: IconButton(
                         icon: Icon(Icons.arrow_forward_ios),
                         onPressed: (_currentPage < chapter - 1)
@@ -196,6 +159,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     Flexible(
+                      flex: 4,
                       child: IconButton(
                           icon: Icon(Icons.search),
                           onPressed: () {
@@ -234,7 +198,7 @@ class _HomePageState extends State<HomePage> {
                         IconButton(
                           icon: Icon(Icons.bookmark),
                           onPressed: () async {
-                            await dataProvider.addBookmarks(
+                            await Provider.of<BookmarkManager>(context).setBookmark(
                                 _id, _currentPage + 1, selectionProvider.list);
                             Scaffold.of(ctx).showSnackBar(SnackBar(
                               content: Text(
@@ -291,7 +255,7 @@ class _HomePageState extends State<HomePage> {
                       }
                       if (snapsho.hasData) {
                         return FutureBuilder(
-                          future: Future.wait([_geeta, _font, _lang, _audio]),
+                          future: Future.wait([_geeta,_audio]),
                           builder: (contx, snapsot) {
                             if (snapsot.hasError) {
                               print(snapsot.error);
@@ -300,49 +264,53 @@ class _HomePageState extends State<HomePage> {
                               return Center(child: CircularProgressIndicator());
                             }
                             final snapshot = snapsot.data[0];
-                            final audiosnapshot = snapsot.data[3];
+                            final audiosnapshot = snapsot.data[1];
                             selectionProvider.add(snapshot.length);
-                            return Column(
-                              children: <Widget>[
-                                if (_id == 7)
-                                  Container(
-                                      width: double.infinity,
-                                      color: Colors.grey,
-                                      child: Text(
-                                        TITLE[j],
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: snapsot.data[1]),
-                                      )),
-                                Expanded(
-                                  child: ListView.builder(
-                                    itemCount: snapshot.length,
-                                    itemBuilder: (ctx, i) {
-                                      final String langData =
-                                          snapsot.data[2] == 0
-                                              ? snapshot[i].nepali
-                                              : snapshot[i].english;
-                                      return InkWell(
-                                        child: Verse(
-                                          geeta: snapshot[i],
-                                          translation: langData,
-                                          fontSize: snapsot.data[1],
-                                          textColor:
-                                              selectionProvider.textColor[i],
-                                          download: audiosnapshot[j].download,
-                                          scaffoldKey: _scaffoldKey,
-                                        ),
-                                        onTap: () {
-                                          selectionProvider.selectVerse(i,
-                                              snapshot[i].sanskrit, langData);
-                                        },
-                                      );
-                                    },
+                            return Consumer2<FontManager, LanguageManager>(
+                                builder:
+                                    (context, fontManager, langManager, _) {
+                              return Column(
+                                children: <Widget>[
+                                  if (_id == 7)
+                                    Container(
+                                        width: double.infinity,
+                                        color: Colors.grey,
+                                        child: Text(
+                                          TITLE[j],
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: fontManager.fontSize),
+                                        )),
+                                  Expanded(
+                                    child: ListView.builder(
+                                      itemCount: snapshot.length,
+                                      itemBuilder: (ctx, i) {
+                                        final String langData =
+                                            langManager.language == 0
+                                                ? snapshot[i].nepali
+                                                : snapshot[i].english;
+                                        return InkWell(
+                                          child: Verse(
+                                            geeta: snapshot[i],
+                                            translation: langData,
+                                            fontSize: fontManager.fontSize,
+                                            textColor:
+                                                selectionProvider.textColor[i],
+                                            download: audiosnapshot[j].download,
+                                            scaffoldKey: _scaffoldKey,
+                                          ),
+                                          onTap: () {
+                                            selectionProvider.selectVerse(i,
+                                                snapshot[i].sanskrit, langData);
+                                          },
+                                        );
+                                      },
+                                    ),
                                   ),
-                                ),
-                              ],
-                            );
+                                ],
+                              );
+                            });
                           },
                         );
                       } else {
@@ -389,6 +357,8 @@ class _HomePageState extends State<HomePage> {
                     ))
                 : Container()
           ],
-        ));
+        ),
+      ),
+    );
   }
 }

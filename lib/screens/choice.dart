@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../models/book.dart';
+import '../providers/font.dart';
 
 class ChoiceScreen extends StatefulWidget {
 
@@ -34,73 +36,76 @@ class _ChoiceScreenState extends State<ChoiceScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: DefaultTabController(
-        length: 2,
-        initialIndex: _initialIndex,
-        child: Scaffold(
-          appBar: AppBar(
-            title: const Text('Geeta'),
-            bottom: TabBar(
-              tabs: [
-                Tab(
-                  child: const Text('Book'),
-                ),
-                Tab(
-                  child: const Text('Chapter'),
-                ),
-              ],
-            ),
-          ),
-          body: TabBarView(
-            children: [
-              ListView.builder(
-                itemCount: BOOK.length,
-                itemBuilder: (ctx, i) {
-                  return buildListTile(
-                      ctx, BOOK.where((test) => test.id == i + 1).toList());
-                },
-              ),
-              GridView.builder(
-                gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                  maxCrossAxisExtent: 50,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                ),
-                itemCount: _chapterCount,
-                itemBuilder: (ctx, i) {
-                  return InkWell(
-                    child: Container(
-                      child: Center(
-                        child: Text(
-                          (i + 1).toString(),
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                      decoration: BoxDecoration(color: Colors.deepPurple),
+      body: Consumer<FontManager>(
+        builder: (context, manager,_) {
+          return DefaultTabController(
+            length: 2,
+            initialIndex: _initialIndex,
+            child: Scaffold(
+              appBar: AppBar(
+                title: TabBar(
+                  tabs: [
+                    Tab(
+                      child: const Text('Book'),
                     ),
-                    onTap: () async {
-                      Navigator.of(context).pushNamedAndRemoveUntil(
-                          '/', (Route<dynamic> route) => false,
-                          arguments: {
-                            'chapter': i,
-                            'id': _id,
-                          });
-                    },
-                  );
-                },
+                    Tab(
+                      child: const Text('Chapter'),
+                    ),
+                  ],
+                ),
               ),
-            ],
-          ),
-        ),
+              body: TabBarView(
+                children: [
+                  ListView.builder(
+                    itemCount: BOOK.length,
+                    itemBuilder: (ctx, i) {
+                      return buildListTile(
+                          ctx, BOOK.where((test) => test.id == i + 1).toList(),manager.fontSize);
+                    },
+                  ),
+                  GridView.builder(
+                    gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                      maxCrossAxisExtent: 50,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
+                    ),
+                    itemCount: _chapterCount,
+                    itemBuilder: (ctx, i) {
+                      return InkWell(
+                        child: Container(
+                          child: Center(
+                            child: Text(
+                              (i + 1).toString(),
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                          decoration: BoxDecoration(color: Colors.deepPurple),
+                        ),
+                        onTap: () async {
+                          Navigator.of(context).pushNamedAndRemoveUntil(
+                              '/', (Route<dynamic> route) => false,
+                              arguments: {
+                                'chapter': i,
+                                'id': _id,
+                              });
+                        },
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
       ),
     );
   }
 
-  Widget buildListTile(BuildContext ctx, List book) {
+  Widget buildListTile(BuildContext ctx, List book, double fontSize) {
     return InkWell(
       child: ListTile(
         leading: Text((book[0].id).toString()),
-        title: Text(book[0].title),
+        title: Text(book[0].title,style: TextStyle(fontSize: fontSize),),
       ),
       onTap: () {
         DefaultTabController.of(ctx).animateTo(1);

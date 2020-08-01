@@ -46,10 +46,10 @@ class _ChoiceScreenState extends State<ChoiceScreen> {
                 title: TabBar(
                   tabs: [
                     Tab(
-                      child: const Text('Book'),
+                      child: Text('Book',style: TextStyle(fontSize: manager.fontSize),),
                     ),
                     Tab(
-                      child: const Text('Chapter'),
+                      child: Text('Chapter',style: TextStyle(fontSize: manager.fontSize),),
                     ),
                   ],
                 ),
@@ -76,7 +76,7 @@ class _ChoiceScreenState extends State<ChoiceScreen> {
                           child: Center(
                             child: Text(
                               (i + 1).toString(),
-                              style: TextStyle(color: Colors.white),
+                              style: TextStyle(color: Colors.white,fontSize: manager.fontSize),
                             ),
                           ),
                           decoration: BoxDecoration(color: Colors.deepPurple),

@@ -1,10 +1,11 @@
 import 'dart:async';
 
-// import 'package:firebase_admob/firebase_admob.dart';
+
 import 'package:Bhagavad_Gita/providers/font.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share/share.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:provider/provider.dart';
 
 import '../widgets/drawer.dart';
@@ -16,7 +17,6 @@ import '../widgets/verse.dart';
 import '../providers/selection.dart';
 import '../providers/data.dart';
 import '../providers/download.dart';
-import '../widgets/progress.dart';
 import '../widgets/title.dart';
 import '../util/strings.dart';
 import '../providers/language.dart';
@@ -38,6 +38,7 @@ class _HomePageState extends State<HomePage> {
   var _scaffoldKey = GlobalKey<ScaffoldState>();
   bool _isFirstInit = true;
   DateTime currentBackPressTime;
+  FirebaseMessaging _messaging = FirebaseMessaging();
 
   @override
   void initState() {
@@ -53,6 +54,32 @@ class _HomePageState extends State<HomePage> {
       _geeta = DataProvider.getData(_id, _currentPage + 1);
       return onValue;
     });
+    _messaging.subscribeToTopic('all');
+    _messaging.configure(
+      onMessage: (Map<String, dynamic> message) async {
+        print('mesage received');
+        print("onMessage: $message");
+        var notification = message["notification"];
+        // _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text("Hi"),));
+        showDialog(
+            context: _scaffoldKey.currentState.context,
+            builder: (context) {
+              return AlertDialog(
+                title: Text(notification["title"]),
+                content: Text(notification["body"]),
+                actions: <Widget>[
+                  FlatButton(onPressed: (){
+                    Navigator.pop(context);
+                  }, child: const Text('OK'))
+                ],
+              );
+            });
+      },
+      onLaunch: (Map<String, dynamic> message) async {
+        print("onLaunch: $message");
+      },
+      onResume: (Map<String, dynamic> message) async {},
+    );
   }
 
   Future<void> restoreState() async {
@@ -66,6 +93,7 @@ class _HomePageState extends State<HomePage> {
       _currentPage = chapter;
       _controller = PageController(initialPage: _currentPage);
       setState(() {
+        print(_controller.page);
         _geeta = DataProvider.getData(_id, _currentPage + 1);
       });
     }
@@ -198,8 +226,9 @@ class _HomePageState extends State<HomePage> {
                         IconButton(
                           icon: Icon(Icons.bookmark),
                           onPressed: () async {
-                            await Provider.of<BookmarkManager>(context).setBookmark(
-                                _id, _currentPage + 1, selectionProvider.list);
+                            await Provider.of<BookmarkManager>(context)
+                                .setBookmark(_id, _currentPage + 1,
+                                    selectionProvider.list);
                             Scaffold.of(ctx).showSnackBar(SnackBar(
                               content: Text(
                                   selectionProvider.list.length.toString() +
@@ -244,18 +273,12 @@ class _HomePageState extends State<HomePage> {
                     builder: (context, snapsho) {
                       if (!snapsho.hasData) {
                         return Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Text(loading),
-                              Progress(),
-                            ],
-                          ),
+                          child: Text(loading),
                         );
                       }
                       if (snapsho.hasData) {
                         return FutureBuilder(
-                          future: Future.wait([_geeta,_audio]),
+                          future: Future.wait([_geeta, _audio]),
                           builder: (contx, snapsot) {
                             if (snapsot.hasError) {
                               print(snapsot.error);
@@ -276,7 +299,7 @@ class _HomePageState extends State<HomePage> {
                                         width: double.infinity,
                                         color: Colors.grey,
                                         child: Text(
-                                          TITLE[j],
+                                          TITLE[_currentPage],
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
                                               fontWeight: FontWeight.bold,

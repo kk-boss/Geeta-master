@@ -1,11 +1,14 @@
 import 'dart:async';
+import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as Path;
-import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 import '../models/geeta.dart';
-import '../data/geeta.dart';
-import '../util/database.dart';
+// import '../data/geeta.dart';
+// import '../util/database.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 class DataProvider with ChangeNotifier {
   int _result = 0;
@@ -31,23 +34,37 @@ class DataProvider with ChangeNotifier {
           color: maps[i]['color']);
     });
   }
+  // static Future<bool> copyData() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   int isDbinserted = prefs.getInt("database");
+  //   if (isDbinserted == null) {
+  //     await Future.forEach(GEETA, (element) async {
+  //       await createData(Geeta(
+  //           book: element["book"],
+  //           chapter: element["chapter"],
+  //           verse: element["verse"],
+  //           nepali: element["nepali"],
+  //           sanskrit: element["sanskrit"],
+  //           english: element["english"]));
+  //     });
+  //     await prefs.setInt("database", 1);
+  //   }
+  //   return true;
+  // }
   static Future<bool> copyData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    int isDbinserted = prefs.getInt("database");
-    if (isDbinserted == null) {
-      await Future.forEach(GEETA, (element) async {
-        await createData(Geeta(
-            book: element["book"],
-            chapter: element["chapter"],
-            verse: element["verse"],
-            nepali: element["nepali"],
-            sanskrit: element["sanskrit"],
-            english: element["english"]));
-      });
-      await prefs.setInt("database", 1);
+    print("entered data");
+    String path = Path.join(await getDatabasesPath(), 'geeta.db');
+    if (FileSystemEntity.typeSync(path) == FileSystemEntityType.notFound) {
+      ByteData data = await rootBundle.load(Path.join('assets', 'geeta.db'));
+       File file = new File(path);
+       final Uint8List bytes = Uint8List(data.lengthInBytes);
+       bytes.setRange(0, data.lengthInBytes, data.buffer.asUint8List());
+      await file.writeAsBytes(bytes);
+      print("data copied");
     }
     return true;
   }
+
 
   Future<void> setColor(int color, int chapter, List<int> verses) async {
     final Database db = await initDatabase();

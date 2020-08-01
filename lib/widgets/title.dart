@@ -14,20 +14,16 @@ class BookTitle extends StatelessWidget {
       child: Container(
         height: kToolbarHeight / 1.5,
         decoration: BoxDecoration(
-          color: Colors.black,
-        ),
-        child: Card(
           color: Theme.of(context).accentColor,
-          elevation: 5.0,
-          child: Center(
-            child: Tooltip(
-              message: title,
-              child: Text(
-                title,
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.fade,
-                style: Theme.of(context).textTheme.headline6,
-              ),
+        ),
+        child: Center(
+          child: Tooltip(
+            message: title,
+            child: Text(
+              title,
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.fade,
+              style: Theme.of(context).textTheme.headline6,
             ),
           ),
         ),
@@ -56,16 +52,16 @@ class ChapterNumber extends StatelessWidget {
     return InkWell(
       child: Container(
         height: kToolbarHeight / 1.5,
+        width: kToolbarHeight / 1.5,
         decoration: BoxDecoration(
-          color: Colors.black,
-        ),
-        child: Card(
           color: Theme.of(context).accentColor,
-          child: Center(
-            child: Text(
-              (_currentPage + 1).toString(),
-              style: Theme.of(context).textTheme.headline5,
-            ),
+        ),
+        child: Center(
+          child: Text(
+            (_currentPage + 1).toString(),
+            style: Theme.of(context).textTheme.headline6,
+            textScaleFactor: 0.75,
+            overflow: TextOverflow.clip,
           ),
         ),
       ),

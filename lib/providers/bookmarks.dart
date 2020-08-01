@@ -8,7 +8,7 @@ class BookmarkManager with ChangeNotifier {
   List<Geeta> _bookmarks;
 
   BookmarkManager() {
-    _loadBookmark();
+    // _loadBookmark();
   }
   static Future<Database> initDatabase() async {
     return openDatabase(
@@ -32,6 +32,8 @@ class BookmarkManager with ChangeNotifier {
           });
           notifyListeners();
         });
+      }).catchError((err){
+        _bookmarks = [];
       });
   }
 

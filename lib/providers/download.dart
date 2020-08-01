@@ -1,11 +1,14 @@
 import 'dart:async';
+import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:path/path.dart' as Path;
-import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
-import '../models/audio.dart';
-import '../data/audio.dart';
-import '../util/database.dart';
+// import '../models/audio.dart';
+// import '../data/audio.dart';
+// import '../util/database.dart';
 
 class Audio {
   final int chapter;
@@ -20,22 +23,44 @@ class Audio {
 }
 
 class Download with ChangeNotifier {
-  static Future<Database> initDatabase()async {
+  static Future<Database> initDatabase() async {
     return openDatabase(
       Path.join(await getDatabasesPath(), 'audio.db'),
     );
   }
+
+  // static Future<bool> copyAudioData() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   int isDbinserted = prefs.getInt("isAudioCreated");
+  //   if (isDbinserted == null) {
+  //     await Future.forEach(AUDIO, (element) async {
+  //       await createAudioData(MyAudio(
+  //         chapter: element["chapter"],
+  //         id: element["id"],
+  //       ));
+  //     });
+  //     await prefs.setInt("isAudioCreated", 1);
+  //   }
+  //   return true;
+  // }
   static Future<bool> copyAudioData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    int isDbinserted = prefs.getInt("isAudioCreated");
-    if (isDbinserted == null) {
-      await Future.forEach(AUDIO, (element) async {
-        await createAudioData(MyAudio(
-          chapter: element["chapter"],
-          id: element["id"],
-        ));
-      });
-      await prefs.setInt("isAudioCreated", 1);
+    debugPrint("entered audio");
+    String path = Path.join(await getDatabasesPath(), 'audio.db');
+    if (FileSystemEntity.typeSync(path) == FileSystemEntityType.notFound) {
+    ByteData data = await 
+        rootBundle.load(Path.join('assets', 'audio.db'));
+      File file = new File(path);
+       final Uint8List bytes = Uint8List(data.lengthInBytes);
+       bytes.setRange(0, data.lengthInBytes, data.buffer.asUint8List());
+      await file.writeAsBytes(bytes);
+      print("Audio copied");
+    // List<int> bytes =
+    //     byteData.buffer.asUint8List(byteData.offsetInBytes, byteData.lengthInBytes);
+    //     print(bytes);
+    //   print("entered here");
+    // await new File(path).writeAsBytes(bytes).then((file) {
+    //   print('copied audio');
+    // });
     }
     return true;
   }

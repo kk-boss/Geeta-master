@@ -4,6 +4,7 @@ import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+
 import './screens/choice.dart';
 import './screens/bookmarks.dart';
 import './screens/settings.dart';
@@ -23,6 +24,7 @@ import './screens/about-us.dart';
 import './providers/download.dart';
 import './util/strings.dart';
 import './controllers/sharedprefs.dart';
+import './screens/admin.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -59,16 +61,16 @@ class _MyAppState extends State<MyApp> {
       DateTime time = DateTime.now();
       String prefTime = await getTime();
       if (prefTime == null) {
-        _interstitialAd
-          ..load()
-          ..show();
+        // _interstitialAd
+        //   ..load()
+        //   ..show();
         await setTime(time.toString());
       } else {
         Duration difference = time.difference(DateTime.parse(prefTime));
         if (difference.inMinutes > 10) {
-          _interstitialAd
-            ..load()
-            ..show();
+          // _interstitialAd
+          //   ..load()
+          //   ..show();
           await setTime(time.toString());
         }
       }
@@ -136,9 +138,9 @@ class _MyAppState extends State<MyApp> {
           value: BookmarkManager(),
         ),
       ],
-      child: Consumer<ThemeManager>(builder: (context, manager, _) {
+      child: Consumer<ThemeManager>(builder: (context, themeManager, _) {
         return MaterialApp(
-          theme: manager.themeData,
+          theme: themeManager.themeData,
           title: 'Bhagavad Gita',
           home: HomePage(),
           routes: {
@@ -150,9 +152,10 @@ class _MyAppState extends State<MyApp> {
             '/aboutApp': (ctx) => AboutApp(),
             '/aboutUs': (ctx) => AboutUs(),
             '/theme': (ctx) => ThemeChooser(),
+            '/test': (ctx)=>FirebaseTest(),
           },
           builder: (context, widget) {
-            _bannerAd..show();
+            // _bannerAd..show();
             return Padding(
               padding: EdgeInsets.only(
                 bottom: _bottomPadding,

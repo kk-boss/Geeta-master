@@ -51,6 +51,13 @@ Widget drawer(BuildContext context) {
             Navigator.of(context).pushNamed('/aboutUs');
           },
         ),
+        ListTile(
+          leading: Icon(Icons.assessment),
+          title: const Text('Send Message'),
+          onTap: (){
+            Navigator.of(context).pushNamed('/test');
+          },
+        ),
       ],
     ),
   ));

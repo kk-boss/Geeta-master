@@ -65,8 +65,8 @@ class _AudioDownloadState extends State<AudioDownload> {
           actions: <Widget>[
             FlatButton(
               onPressed: () async {
-                await _interstitialAd.load();
-                await _interstitialAd.show();
+                // await _interstitialAd.load();
+                // await _interstitialAd.show();
                 Navigator.of(context)
                     .pushNamedAndRemoveUntil('/', (route) => false);
               },

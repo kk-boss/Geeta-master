@@ -4,27 +4,10 @@ import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-
-import './screens/choice.dart';
-import './screens/bookmarks.dart';
-import './screens/settings.dart';
-import './screens/home.dart';
-import './screens/search.dart';
-import './screens/audio.dart';
-import './screens/theme_chooser.dart';
-import './providers/audio.dart';
-import './providers/selection.dart';
-import './providers/data.dart';
-import './providers/theme_manager.dart';
-import './providers/font.dart';
-import './providers/language.dart';
-import './providers/bookmarks.dart';
-import './screens/about-app.dart';
-import './screens/about-us.dart';
-import './providers/download.dart';
-import './util/strings.dart';
 import './controllers/sharedprefs.dart';
-import './screens/admin.dart';
+import './providers/providers.dart';
+import './screens/screens.dart';
+import './util/strings.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -152,7 +135,7 @@ class _MyAppState extends State<MyApp> {
             '/aboutApp': (ctx) => AboutApp(),
             '/aboutUs': (ctx) => AboutUs(),
             '/theme': (ctx) => ThemeChooser(),
-            '/test': (ctx)=>FirebaseTest(),
+            '/test': (ctx) => FirebaseTest(),
           },
           builder: (context, widget) {
             // _bannerAd..show();

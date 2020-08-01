@@ -1,26 +1,21 @@
 import 'dart:async';
 
-
 import 'package:Bhagavad_Gita/providers/font.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:share/share.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:provider/provider.dart';
+import 'package:share/share.dart';
 
-import '../widgets/drawer.dart';
-import '../util/variables.dart';
+import '../controllers/sharedprefs.dart';
 import '../models/book.dart';
 import '../models/geeta.dart';
-import '../controllers/sharedprefs.dart';
-import '../widgets/verse.dart';
-import '../providers/selection.dart';
-import '../providers/data.dart';
-import '../providers/download.dart';
-import '../widgets/title.dart';
+import '../providers/providers.dart';
 import '../util/strings.dart';
-import '../providers/language.dart';
-import '../providers/bookmarks.dart';
+import '../util/variables.dart';
+import '../widgets/drawer.dart';
+import '../widgets/title.dart';
+import '../widgets/verse.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -30,7 +25,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _currentPage = 0;
   int _id = 7;
-  PageController _controller = new PageController();
+  final PageController _controller = new PageController();
   Future<bool> _copy;
   Future<List<Geeta>> _geeta;
   Future<bool> _copyAudio;
@@ -68,9 +63,11 @@ class _HomePageState extends State<HomePage> {
                 title: Text(notification["title"]),
                 content: Text(notification["body"]),
                 actions: <Widget>[
-                  FlatButton(onPressed: (){
-                    Navigator.pop(context);
-                  }, child: const Text('OK'))
+                  FlatButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text('OK'))
                 ],
               );
             });
@@ -91,11 +88,12 @@ class _HomePageState extends State<HomePage> {
     if (id != null && chapter != null && _routeArgs == null) {
       _id = id;
       _currentPage = chapter;
-      _controller = PageController(initialPage: _currentPage);
-      setState(() {
-        print(_controller.page);
-        _geeta = DataProvider.getData(_id, _currentPage + 1);
-      });
+      if (_controller.hasClients) {
+        _controller.jumpToPage(_currentPage);
+      }
+      // setState(() {
+      _geeta = DataProvider.getData(_id, _currentPage + 1);
+      // });
     }
   }
 
@@ -107,13 +105,22 @@ class _HomePageState extends State<HomePage> {
       if (routeArgs != null) {
         _currentPage = routeArgs['chapter'] ?? 0;
         _id = routeArgs['id'] ?? 7;
-        _controller = PageController(initialPage: _currentPage);
+        if (_controller.hasClients) {
+          _controller.jumpToPage(_currentPage);
+        }
         setBookId(_id);
         setChapter(_currentPage);
       }
       _isFirstInit = false;
     }
     super.didChangeDependencies();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    print('Controller disposed');
+    super.dispose();
   }
 
   @override
@@ -136,7 +143,7 @@ class _HomePageState extends State<HomePage> {
             ));
           return Future.value(false);
         }
-        return Future.value(true);
+        return Provider.of<MyAudio>(context, listen: false).disposeAudio();
       },
       child: Scaffold(
         key: _scaffoldKey,
@@ -150,7 +157,7 @@ class _HomePageState extends State<HomePage> {
                       flex: 4,
                       child: IconButton(
                         icon: Icon(Icons.arrow_back_ios),
-                        onPressed: (_currentPage > 0)
+                        onPressed: (_currentPage > 0 && _controller.hasClients)
                             ? () async {
                                 _controller.jumpToPage(_currentPage - 1);
                                 _geeta =
@@ -175,8 +182,13 @@ class _HomePageState extends State<HomePage> {
                       flex: 4,
                       child: IconButton(
                         icon: Icon(Icons.arrow_forward_ios),
-                        onPressed: (_currentPage < chapter - 1)
+                        onPressed: (_currentPage < chapter - 1 &&
+                                _controller.hasClients)
                             ? () async {
+                                // _controller.nextPage(
+                                //   duration: Duration(milliseconds: 200),
+                                //   curve: Curves.easeInCubic,
+                                // );
                                 _controller.jumpToPage(_currentPage + 1);
                                 _geeta =
                                     DataProvider.getData(_id, _currentPage + 1);
@@ -267,7 +279,7 @@ class _HomePageState extends State<HomePage> {
             PageView.builder(
               physics: NeverScrollableScrollPhysics(),
               controller: _controller,
-              itemBuilder: (ct, j) {
+              itemBuilder: (_, j) {
                 return FutureBuilder(
                     future: Future.wait([_copy, _copyAudio]),
                     builder: (context, snapsho) {

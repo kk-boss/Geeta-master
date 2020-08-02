@@ -8,15 +8,6 @@ Widget drawer(BuildContext context) {
       children: <Widget>[
         InkWell(
           child: ListTile(
-            leading: Icon(Icons.home),
-            title: const Text(home),
-          ),
-          onTap: () {
-            Navigator.of(context).pushReplacementNamed('/');
-          },
-        ),
-        InkWell(
-          child: ListTile(
             leading: Icon(Icons.bookmark),
             title: const Text(bookmarks),
           ),
@@ -54,7 +45,7 @@ Widget drawer(BuildContext context) {
         ListTile(
           leading: Icon(Icons.assessment),
           title: const Text('Send Message'),
-          onTap: (){
+          onTap: () {
             Navigator.of(context).pushNamed('/test');
           },
         ),

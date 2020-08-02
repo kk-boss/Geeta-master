@@ -1,11 +1,10 @@
-class MyAudio {
-final int chapter;
-final int download;
-final int id;
-const MyAudio({this.chapter,this.download,this.id});
- Map<String, dynamic> toMap() {
+class Audio {
+  final int id;
+  final int download;
+  const Audio({this.id, this.download});
+  Map<String, dynamic> toMap() {
     return {
-      'chapter': chapter,
+      'download': download,
       'id': id,
     };
   }

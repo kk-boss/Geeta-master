@@ -8,3 +8,4 @@ export './home.dart';
 export './search.dart';
 export './settings.dart';
 export './theme_chooser.dart';
+export './homepage.dart';

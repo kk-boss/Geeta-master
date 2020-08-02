@@ -100,13 +100,7 @@ class _MyAppState extends State<MyApp> {
           value: Selection(),
         ),
         ChangeNotifierProvider.value(
-          value: DataProvider(),
-        ),
-        ChangeNotifierProvider.value(
           value: SearchProvider(),
-        ),
-        ChangeNotifierProvider.value(
-          value: Download(),
         ),
         ChangeNotifierProvider.value(
           value: ThemeManager(),
@@ -120,12 +114,15 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider.value(
           value: BookmarkManager(),
         ),
+        ChangeNotifierProvider.value(
+          value: Gita(),
+        ),
       ],
       child: Consumer<ThemeManager>(builder: (context, themeManager, _) {
         return MaterialApp(
           theme: themeManager.themeData,
           title: 'Bhagavad Gita',
-          home: HomePage(),
+          home: Home(),
           routes: {
             '/choice': (ctx) => ChoiceScreen(),
             '/bookmarks': (ctx) => Bookmarks(),

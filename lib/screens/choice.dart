@@ -5,7 +5,6 @@ import '../models/book.dart';
 import '../providers/font.dart';
 
 class ChoiceScreen extends StatefulWidget {
-
   @override
   _ChoiceScreenState createState() => _ChoiceScreenState();
 }
@@ -17,8 +16,9 @@ class _ChoiceScreenState extends State<ChoiceScreen> {
   int _initialIndex = 0;
   @override
   void initState() {
-    super.initState();  
+    super.initState();
   }
+
   @override
   void didChangeDependencies() {
     if (_firstRun) {
@@ -26,78 +26,92 @@ class _ChoiceScreenState extends State<ChoiceScreen> {
           ModalRoute.of(context).settings.arguments as Map<String, int>;
       if (routeArgs != null) {
         _id = routeArgs["id"];
-        _chapterCount = BOOK.where((test) => test.id == _id).toList()[0].chapter;
+        _chapterCount =
+            BOOK.where((test) => test.id == _id).toList()[0].chapter;
         _initialIndex = 1;
       }
       _firstRun = false;
     }
     super.didChangeDependencies();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Consumer<FontManager>(
-        builder: (context, manager,_) {
-          return DefaultTabController(
-            length: 2,
-            initialIndex: _initialIndex,
-            child: Scaffold(
-              appBar: AppBar(
-                title: TabBar(
-                  tabs: [
-                    Tab(
-                      child: Text('Book',style: TextStyle(fontSize: manager.fontSize),),
+      body: Consumer<FontManager>(builder: (context, manager, _) {
+        return DefaultTabController(
+          length: 2,
+          initialIndex: _initialIndex,
+          child: Scaffold(
+            appBar: AppBar(
+              title: TabBar(
+                tabs: [
+                  Tab(
+                    child: Text(
+                      'Book',
+                      style: TextStyle(fontSize: manager.fontSize),
                     ),
-                    Tab(
-                      child: Text('Chapter',style: TextStyle(fontSize: manager.fontSize),),
-                    ),
-                  ],
-                ),
-              ),
-              body: TabBarView(
-                children: [
-                  ListView.builder(
-                    itemCount: BOOK.length,
-                    itemBuilder: (ctx, i) {
-                      return buildListTile(
-                          ctx, BOOK.where((test) => test.id == i + 1).toList(),manager.fontSize);
-                    },
                   ),
-                  GridView.builder(
-                    gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                      maxCrossAxisExtent: 50,
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 10,
+                  Tab(
+                    child: Text(
+                      'Chapter',
+                      style: TextStyle(fontSize: manager.fontSize),
                     ),
-                    itemCount: _chapterCount,
-                    itemBuilder: (ctx, i) {
-                      return InkWell(
-                        child: Container(
-                          child: Center(
-                            child: Text(
-                              (i + 1).toString(),
-                              style: TextStyle(color: Colors.white,fontSize: manager.fontSize),
-                            ),
-                          ),
-                          decoration: BoxDecoration(color: Colors.deepPurple),
-                        ),
-                        onTap: () async {
-                          Navigator.of(context).pushNamedAndRemoveUntil(
-                              '/', (Route<dynamic> route) => false,
-                              arguments: {
-                                'chapter': i,
-                                'id': _id,
-                              });
-                        },
-                      );
-                    },
                   ),
                 ],
               ),
             ),
-          );
-        }
-      ),
+            body: TabBarView(
+              children: [
+                ListView.builder(
+                  itemCount: BOOK.length,
+                  itemBuilder: (ctx, i) {
+                    return buildListTile(
+                        ctx,
+                        BOOK.where((test) => test.id == i + 1).toList(),
+                        manager.fontSize);
+                  },
+                ),
+                GridView.builder(
+                  gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                    maxCrossAxisExtent: 50,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                  ),
+                  itemCount: _chapterCount,
+                  itemBuilder: (ctx, i) {
+                    return InkWell(
+                      child: Container(
+                        child: Center(
+                          child: Text(
+                            (i + 1).toString(),
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: manager.fontSize),
+                          ),
+                        ),
+                        decoration: BoxDecoration(color: Colors.deepPurple),
+                      ),
+                      onTap: () async {
+                        // Navigator.of(context).pushNamedAndRemoveUntil(
+                        //     '/', (Route<dynamic> route) => false,
+                        //     arguments: {
+                        //       'chapter': i,
+                        //       'id': _id,
+                        //     });
+                        Navigator.of(context).pop({
+                          'chapter': i,
+                          'id': _id,
+                        });
+                      },
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      }),
     );
   }
 
@@ -105,7 +119,10 @@ class _ChoiceScreenState extends State<ChoiceScreen> {
     return InkWell(
       child: ListTile(
         leading: Text((book[0].id).toString()),
-        title: Text(book[0].title,style: TextStyle(fontSize: fontSize),),
+        title: Text(
+          book[0].title,
+          style: TextStyle(fontSize: fontSize),
+        ),
       ),
       onTap: () {
         DefaultTabController.of(ctx).animateTo(1);

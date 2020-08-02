@@ -1,33 +1,13 @@
-import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../widgets/audio.dart';
-import '../providers/download.dart';
-import '../util/strings.dart';
+import '../providers/gita.dart';
 
-class AudioDownload extends StatefulWidget {
-  @override
-  _AudioDownloadState createState() => _AudioDownloadState();
-}
-
-class _AudioDownloadState extends State<AudioDownload> {
-  Future<List<Audio>> _audio;
-  InterstitialAd _interstitialAd;
-  @override
-  void initState() {
-    super.initState();
-    _audio = Download.getData();
-    _interstitialAd = createInterstitialAd();
-  }
-
-  InterstitialAd createInterstitialAd() {
-    return InterstitialAd(
-      adUnitId: interId,
-    );
-  }
-
+class AudioDownload extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final gita = Provider.of<Gita>(context);
     return WillPopScope(
       onWillPop: () {
         return showDialog(
@@ -62,37 +42,25 @@ class _AudioDownloadState extends State<AudioDownload> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Audio List'),
-          actions: <Widget>[
-            FlatButton(
-              onPressed: () async {
-                // await _interstitialAd.load();
-                // await _interstitialAd.show();
-                Navigator.of(context)
-                    .pushNamedAndRemoveUntil('/', (route) => false);
-              },
-              child: const Text('Reload App'),
-            ),
-          ],
         ),
         body: SafeArea(
-          child: FutureBuilder(
-              future: _audio,
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return CircularProgressIndicator();
-                }
-                final List<Audio> audio = snapshot.data;
-                return ListView.builder(
-                  itemBuilder: (context, index) {
-                    return AudioList(
-                      index: index,
-                      chapter: audio[index].chapter,
-                      isdownload: audio[index].download,
-                    );
-                  },
-                  itemCount: 18,
-                );
-              }),
+          child: Builder(
+            builder: (context) {
+              if (gita.audio.isEmpty) {
+                return CircularProgressIndicator();
+              }
+              return ListView.builder(
+                itemBuilder: (context, index) {
+                  return AudioList(
+                    index: index,
+                    chapter: gita.audio[index].id,
+                    isdownload: gita.audio[index].download,
+                  );
+                },
+                itemCount: 18,
+              );
+            },
+          ),
         ),
       ),
     );

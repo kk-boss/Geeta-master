@@ -8,8 +8,9 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
-import '../providers/download.dart';
+import '../providers/gita.dart';
 
 class AudioList extends StatefulWidget {
   AudioList({Key key, this.index, this.isdownload, this.chapter})
@@ -49,7 +50,7 @@ class _AudioListState extends State<AudioList> {
     var httpClient = http.Client();
     var request = http.Request('GET', Uri.parse(url));
     var response = httpClient.send(request).catchError((onError) {
-       print('error');
+      print('error');
     });
     String dir = (await getApplicationDocumentsDirectory()).path;
     List<List<int>> chunks = new List();
@@ -98,7 +99,7 @@ class _AudioListState extends State<AudioList> {
   //     print(e);
   //   }
   // }
-    Future<void> unZip(File file, String dir) async {
+  Future<void> unZip(File file, String dir) async {
     final bytes = file.readAsBytesSync();
     final archive = ZipDecoder().decodeBytes(bytes);
     for (final file in archive) {
@@ -113,11 +114,13 @@ class _AudioListState extends State<AudioList> {
         Directory('$dir/audio/' + filename)..create(recursive: true);
       }
     }
-     await Download.updateAudio(widget.chapter, true);
-        file.deleteSync(recursive: true);
-        setState(() {
-          _download = 3;
-        });
+    await Provider.of<Gita>(context, listen: false)
+        .updateAudio(widget.chapter, true);
+    file.deleteSync(recursive: true);
+    setState(() {
+      _download = 0;
+      _isdownload = 1;
+    });
   }
 
   @override
@@ -159,13 +162,16 @@ class _AudioListState extends State<AudioList> {
                                     folder
                                         .delete(recursive: true)
                                         .then((fileSystemEntity) {
-                                      Download.updateAudio(
-                                          widget.chapter, false);
+                                      Provider.of<Gita>(context, listen: false)
+                                          .updateAudio(widget.chapter, false);
                                       setState(() {
                                         _isdownload = 0;
                                       });
                                     }).catchError((onError) {
-                                      Scaffold.of(context).showSnackBar(SnackBar(content: const Text('An error occured'),));
+                                      Scaffold.of(context)
+                                          .showSnackBar(SnackBar(
+                                        content: const Text('An error occured'),
+                                      ));
                                     });
                                     Navigator.of(context).pop();
                                   },
@@ -180,24 +186,27 @@ class _AudioListState extends State<AudioList> {
                         },
                       );
                     }),
-              if(_isdownload == 0)
-                   IconButton(
-                      icon: Icon(Icons.file_download),
-                      onPressed: widget.index < uri.length
-                          ? () async {
-                            var connection = await (Connectivity().checkConnectivity());
-                            if(connection==ConnectivityResult.none){
-                               Scaffold.of(context).hideCurrentSnackBar();
-                              Scaffold.of(context).showSnackBar(SnackBar(content: const Text('No internet connection'),));
-                              return ;
+              if (_isdownload == 0)
+                IconButton(
+                    icon: Icon(Icons.file_download),
+                    onPressed: widget.index < uri.length
+                        ? () async {
+                            var connection =
+                                await (Connectivity().checkConnectivity());
+                            if (connection == ConnectivityResult.none) {
+                              Scaffold.of(context).hideCurrentSnackBar();
+                              Scaffold.of(context).showSnackBar(SnackBar(
+                                content: const Text('No internet connection'),
+                              ));
+                              return;
                             }
-                              setState(() {
-                                _download = 1;
-                                _isdownload = 2;
-                              });
-                              await download(uri[widget.index]);
-                            }
-                          : null)
+                            setState(() {
+                              _download = 1;
+                              _isdownload = 2;
+                            });
+                            await download(uri[widget.index]);
+                          }
+                        : null)
             ],
           ),
         ],
@@ -226,13 +235,9 @@ class _AudioListState extends State<AudioList> {
       case 2:
         return Row(
           children: <Widget>[
-            const Text('Extracting..'),
             CircularProgressIndicator(),
           ],
         );
-        break;
-      case 3:
-        return const Text('Reload App');
         break;
       default:
         return Container();

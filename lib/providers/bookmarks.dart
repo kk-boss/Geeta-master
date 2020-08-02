@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:path/path.dart' as Path;
 import 'package:sqflite/sqflite.dart';
 
 import '../models/geeta.dart';
+import '../controllers/database-helper.dart';
 
 class BookmarkManager with ChangeNotifier {
   List<Geeta> _bookmarks;
@@ -10,31 +10,26 @@ class BookmarkManager with ChangeNotifier {
   BookmarkManager() {
     // _loadBookmark();
   }
-  static Future<Database> initDatabase() async {
-    return openDatabase(
-      Path.join(await getDatabasesPath(), 'geeta.db'),
-    );
-  }
 
   void _loadBookmark() {
-   initDatabase().then((Database db) {
-        db.query('geeta', where: 'isBookmark=?', whereArgs: [1]).then(
-            (List<Map<String, dynamic>> maps) {
-          _bookmarks = List.generate(maps.length, (i) {
-            return Geeta(
-                book: maps[i]['book'],
-                chapter: maps[i]['chapter'],
-                verse: maps[i]['verse'],
-                sanskrit: maps[i]['sanskrit'],
-                nepali: maps[i]['nepali'],
-                english: maps[i]['english'],
-                color: maps[i]['color']);
-          });
-          notifyListeners();
+    DatabaseHelper.initDatabase().then((Database db) {
+      db.query('geeta', where: 'isBookmark=?', whereArgs: [1]).then(
+          (List<Map<String, dynamic>> maps) {
+        _bookmarks = List.generate(maps.length, (i) {
+          return Geeta(
+              book: maps[i]['book'],
+              chapter: maps[i]['chapter'],
+              verse: maps[i]['verse'],
+              sanskrit: maps[i]['sanskrit'],
+              nepali: maps[i]['nepali'],
+              english: maps[i]['english'],
+              color: maps[i]['color']);
         });
-      }).catchError((err){
-        _bookmarks = [];
+        notifyListeners();
       });
+    }).catchError((err) {
+      _bookmarks = [];
+    });
   }
 
   List<Geeta> get bookmarks {
@@ -45,22 +40,20 @@ class BookmarkManager with ChangeNotifier {
   }
 
   Future<void> setBookmark(int id, int chapter, List<int> verses) async {
-    final Database db = await initDatabase();
+    final Database db = await DatabaseHelper.initDatabase();
     for (var verse in verses) {
       await db.update('geeta', {'isBookmark': 1},
           where: 'book=? and chapter=? and verse=?',
           whereArgs: [id, chapter, verse]);
     }
-    await db.close();
     notifyListeners();
     _loadBookmark();
   }
 
   Future<void> deleteBookmark(int chapter, int verse) async {
-    final Database db = await initDatabase();
+    final Database db = await DatabaseHelper.initDatabase();
     await db.update('geeta', {'isBookmark': 0},
         where: 'chapter=? and verse=?', whereArgs: [chapter, verse]);
-    await db.close();
     notifyListeners();
     _loadBookmark();
   }

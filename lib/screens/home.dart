@@ -26,10 +26,8 @@ class _HomePageState extends State<HomePage> {
   int _currentPage = 0;
   int _id = 7;
   final PageController _controller = new PageController();
-  Future<bool> _copy;
   Future<List<Geeta>> _geeta;
-  Future<bool> _copyAudio;
-  Future<List<Audio>> _audio;
+  // Future<bool> _copyAudio;
   var _scaffoldKey = GlobalKey<ScaffoldState>();
   bool _isFirstInit = true;
   DateTime currentBackPressTime;
@@ -41,14 +39,6 @@ class _HomePageState extends State<HomePage> {
       restoreState();
     });
     super.initState();
-    _copyAudio = Download.copyAudioData().then((onValue) {
-      _audio = Download.getData();
-      return onValue;
-    });
-    _copy = DataProvider.copyData().then((onValue) {
-      _geeta = DataProvider.getData(_id, _currentPage + 1);
-      return onValue;
-    });
     _messaging.subscribeToTopic('all');
     _messaging.configure(
       onMessage: (Map<String, dynamic> message) async {
@@ -91,9 +81,6 @@ class _HomePageState extends State<HomePage> {
       if (_controller.hasClients) {
         _controller.jumpToPage(_currentPage);
       }
-      // setState(() {
-      _geeta = DataProvider.getData(_id, _currentPage + 1);
-      // });
     }
   }
 
@@ -160,8 +147,8 @@ class _HomePageState extends State<HomePage> {
                         onPressed: (_currentPage > 0 && _controller.hasClients)
                             ? () async {
                                 _controller.jumpToPage(_currentPage - 1);
-                                _geeta =
-                                    DataProvider.getData(_id, _currentPage + 1);
+                                // _geeta =
+                                //     DataProvider.getData(_id, _currentPage + 1);
                                 await setBookId(_id);
                                 await setChapter(_currentPage);
                               }
@@ -176,7 +163,10 @@ class _HomePageState extends State<HomePage> {
                     Spacer(),
                     Flexible(
                       flex: 4,
-                      child: ChapterNumber(currentPage: _currentPage, id: _id),
+                      child: ChapterNumber(
+                        currentPage: _currentPage,
+                        // id: _id,
+                      ),
                     ),
                     Flexible(
                       flex: 4,
@@ -190,8 +180,8 @@ class _HomePageState extends State<HomePage> {
                                 //   curve: Curves.easeInCubic,
                                 // );
                                 _controller.jumpToPage(_currentPage + 1);
-                                _geeta =
-                                    DataProvider.getData(_id, _currentPage + 1);
+                                // _geeta =
+                                //     DataProvider.getData(_id, _currentPage + 1);
                                 await setBookId(_id);
                                 await setChapter(_currentPage);
                               }
@@ -280,78 +270,70 @@ class _HomePageState extends State<HomePage> {
               physics: NeverScrollableScrollPhysics(),
               controller: _controller,
               itemBuilder: (_, j) {
-                return FutureBuilder(
-                    future: Future.wait([_copy, _copyAudio]),
-                    builder: (context, snapsho) {
-                      if (!snapsho.hasData) {
-                        return Center(
-                          child: Text(loading),
-                        );
-                      }
-                      if (snapsho.hasData) {
-                        return FutureBuilder(
-                          future: Future.wait([_geeta, _audio]),
-                          builder: (contx, snapsot) {
-                            if (snapsot.hasError) {
-                              print(snapsot.error);
-                            }
-                            if (!snapsot.hasData) {
-                              return Center(child: CircularProgressIndicator());
-                            }
-                            final snapshot = snapsot.data[0];
-                            final audiosnapshot = snapsot.data[1];
-                            selectionProvider.add(snapshot.length);
-                            return Consumer2<FontManager, LanguageManager>(
-                                builder:
-                                    (context, fontManager, langManager, _) {
-                              return Column(
-                                children: <Widget>[
-                                  if (_id == 7)
-                                    Container(
-                                        width: double.infinity,
-                                        color: Colors.grey,
-                                        child: Text(
-                                          TITLE[_currentPage],
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: fontManager.fontSize),
-                                        )),
-                                  Expanded(
-                                    child: ListView.builder(
-                                      itemCount: snapshot.length,
-                                      itemBuilder: (ctx, i) {
-                                        final String langData =
-                                            langManager.language == 0
-                                                ? snapshot[i].nepali
-                                                : snapshot[i].english;
-                                        return InkWell(
-                                          child: Verse(
-                                            geeta: snapshot[i],
-                                            translation: langData,
-                                            fontSize: fontManager.fontSize,
-                                            textColor:
-                                                selectionProvider.textColor[i],
-                                            download: audiosnapshot[j].download,
-                                            scaffoldKey: _scaffoldKey,
-                                          ),
-                                          onTap: () {
-                                            selectionProvider.selectVerse(i,
-                                                snapshot[i].sanskrit, langData);
-                                          },
-                                        );
+                return Builder(builder: (context) {
+                  if (context.debugDoingBuild) {
+                    return FutureBuilder(
+                      future: Future.wait([_geeta]),
+                      builder: (contx, snapsot) {
+                        if (snapsot.hasError) {
+                          print(snapsot.error);
+                        }
+                        if (!snapsot.hasData) {
+                          return Center(child: CircularProgressIndicator());
+                        }
+                        final snapshot = snapsot.data[0];
+                        final audiosnapshot = snapsot.data[1];
+                        selectionProvider.add(snapshot.length);
+                        return Consumer2<FontManager, LanguageManager>(
+                            builder: (context, fontManager, langManager, _) {
+                          return Column(
+                            children: <Widget>[
+                              if (_id == 7)
+                                Container(
+                                    width: double.infinity,
+                                    color: Colors.grey,
+                                    child: Text(
+                                      TITLE[_currentPage],
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: fontManager.fontSize),
+                                    )),
+                              Expanded(
+                                child: ListView.builder(
+                                  itemCount: snapshot.length,
+                                  itemBuilder: (ctx, i) {
+                                    final String langData =
+                                        langManager.language == 0
+                                            ? snapshot[i].nepali
+                                            : snapshot[i].english;
+                                    return InkWell(
+                                      child: Verse(
+                                        geeta: snapshot[i],
+                                        translation: langData,
+                                        fontSize: fontManager.fontSize,
+                                        textColor:
+                                            selectionProvider.textColor[i],
+                                        download: audiosnapshot[j].download,
+                                        scaffoldKey: _scaffoldKey,
+                                      ),
+                                      onTap: () {
+                                        selectionProvider.selectVerse(
+                                            i, snapshot[i].sanskrit, langData);
                                       },
-                                    ),
-                                  ),
-                                ],
-                              );
-                            });
-                          },
-                        );
-                      } else {
-                        return Center(child: const Text(fileNotCopied));
-                      }
-                    });
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          );
+                        });
+                      },
+                    );
+                  } else {
+                    return Center(child: const Text(fileNotCopied));
+                  }
+                });
               },
               itemCount: chapter,
               onPageChanged: (page) {
@@ -368,16 +350,16 @@ class _HomePageState extends State<HomePage> {
                       children: color.map((c) {
                         return InkWell(
                           onTap: () async {
-                            final int col =
-                                color.indexWhere((test) => test == c);
-                            await Provider.of<DataProvider>(context,
-                                    listen: false)
-                                .setColor(col, _currentPage + 1,
-                                    selectionProvider.list);
+                            // final int col =
+                            //     color.indexWhere((test) => test == c);
+                            // await Provider.of<DataProvider>(context,
+                            //         listen: false)
+                            //     .setColor(col, _currentPage + 1,
+                            //         selectionProvider.list);
                             selectionProvider.clear();
                             setState(() {
-                              _geeta =
-                                  DataProvider.getData(_id, _currentPage + 1);
+                              // _geeta =
+                              //     DataProvider.getData(_id, _currentPage + 1);
                             });
                           },
                           child: Container(

@@ -66,7 +66,6 @@ flutter:
    - assets/santosh.jpg
    - assets/aashish.jpg
    - assets/geeta.db
-   - assets/audio.db
   #  - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

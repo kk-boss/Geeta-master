@@ -10,7 +10,7 @@ class Selection with ChangeNotifier {
   List<bool> get verses => _verses;
   List<int> get list => _list;
   void selectVerse(int i, String sanskrit, String translation) {
-    if(!_selection.remove('$sanskrit\n$translation\n')){
+    if (!_selection.remove('$sanskrit\n$translation\n')) {
       _selection.insert(i, '$sanskrit\n$translation\n');
     }
     if (_textColor[i] == Colors.red) {
@@ -18,7 +18,7 @@ class Selection with ChangeNotifier {
     } else {
       _textColor[i] = Colors.red;
     }
-    if(!_list.remove(i+1)){
+    if (!_list.remove(i + 1)) {
       _list.add(i + 1);
     }
     _verses[i] = !_verses[i];

@@ -1,9 +1,8 @@
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../widgets/verse.dart';
-import '../providers/data.dart';
+import '../providers/search.dart';
 import '../models/geeta.dart';
 
 class Search extends StatefulWidget {
@@ -19,57 +18,71 @@ class _SearchState extends State<Search> {
   int _val = 0;
   SearchProvider _searchProvider;
   @override
-  void dispose() { 
+  void dispose() {
     _searchProvider.clear();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     _searchProvider = Provider.of<SearchProvider>(context);
-     List<Geeta> lists = _searchProvider.lists;
+    List<Geeta> lists = _searchProvider.lists;
     return Scaffold(
         appBar: PreferredSize(
-          preferredSize: const Size(double.infinity, kToolbarHeight),
-          child: Builder(
-            builder: (ctx) =>
-                SafeArea(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor,
-                ),
-                child: Container(
-                  decoration: BoxDecoration(
-                      // color: Colors.tealAccent,
+          preferredSize: const Size(double.infinity, kToolbarHeight * 2),
+          child: SafeArea(
+            child: Container(
+              color: Theme.of(context).primaryColor,
+              child: Row(
+                children: <Widget>[
+                  IconButton(
+                      icon: Icon(Icons.arrow_back),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      }),
+                  Expanded(
+                    child: Card(
                       color: Theme.of(context).accentColor,
-                      borderRadius: BorderRadius.circular(35)),
-                  child: ListTile(
-                      leading: IconButton(
-                          icon: Icon(Icons.arrow_back),
-                          onPressed: () {
-                            Navigator.of(ctx).pop();
-                          }),
-                      title: TextField(
-                        controller: _text,
-                        onSubmitted: (str) async {
-                          if(str!=''){
-                          await _searchProvider.searchData(str, _val);
-                          }
-                        },
-                        textInputAction: TextInputAction.search,
-                        autofocus: true,
-                        decoration: InputDecoration.collapsed(
-                          hintText: 'Search Keyword',
+                      elevation: 5.0,
+                      margin: const EdgeInsets.all(8.0),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                        child: Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: TextField(
+                                controller: _text,
+                                onSubmitted: (str) async {
+                                  if (str != '') {
+                                    await _searchProvider.searchData(str, _val);
+                                  }
+                                },
+                                textInputAction: TextInputAction.search,
+                                autofocus: true,
+                                decoration: InputDecoration.collapsed(
+                                  hintText: 'Search Keyword',
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.search),
+                              onPressed: () async {
+                                if (_text.text != '') {
+                                  await _searchProvider.searchData(
+                                      _text.text, _val);
+                                }
+                                FocusScope.of(context).unfocus();
+                              },
+                            ),
+                          ],
                         ),
                       ),
-                      trailing: IconButton(
-                          icon: Icon(Icons.search),
-                          onPressed: () async {
-                            if(_text.text!=''){
-                            await _searchProvider.searchData(_text.text, _val);
-                            }
-                              FocusScope.of(context).unfocus();
-                          })),
-                ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -80,15 +93,26 @@ class _SearchState extends State<Search> {
                     itemCount: lists.length,
                     itemBuilder: (ctx, i) {
                       if (_val == 2) {
-                        return Verse(geeta: lists[i],translation: lists[i].english,fontSize: 18,textColor: Colors.white,showAudio: false,);
+                        return Verse(
+                          geeta: lists[i],
+                          translation: lists[i].english,
+                          fontSize: 18,
+                          textColor: Colors.white,
+                          showAudio: false,
+                        );
                       }
-                      return Verse(geeta: lists[i],translation: lists[i].nepali,fontSize: 18,textColor: Colors.white,showAudio: false,);
+                      return Verse(
+                        geeta: lists[i],
+                        translation: lists[i].nepali,
+                        fontSize: 18,
+                        textColor: Colors.white,
+                        showAudio: false,
+                      );
                     })
                 : Center(
                     child: const Text('Nothing Found'),
                   )
-            : Column(
-              children: [
+            : Column(children: [
                 Center(
                   child: ToggleButtons(
                     children: [

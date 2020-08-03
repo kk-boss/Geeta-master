@@ -4,7 +4,6 @@ export './admin.dart';
 export './audio.dart';
 export './bookmarks.dart';
 export './choice.dart';
-export './home.dart';
 export './search.dart';
 export './settings.dart';
 export './theme_chooser.dart';

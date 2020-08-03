@@ -1,8 +1,6 @@
-import 'package:Bhagavad_Gita/util/strings.dart';
-import 'package:Bhagavad_Gita/widgets/drawer.dart';
-import 'package:Bhagavad_Gita/widgets/title.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:provider/provider.dart';
 import 'package:share/share.dart';
 
@@ -11,6 +9,9 @@ import '../providers/providers.dart';
 import '../models/book.dart';
 import '../util/variables.dart';
 import '../controllers/database-helper.dart';
+import '../util/strings.dart';
+import '../widgets/drawer.dart';
+import '../widgets/title.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -20,6 +21,41 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   DateTime currentBackPressTime;
   final _scaffoldKey = GlobalKey<ScaffoldState>();
+  final _messaging = FirebaseMessaging();
+
+  @override
+  void initState() {
+    super.initState();
+    _messaging.subscribeToTopic('all');
+    _messaging.configure(
+      onMessage: (Map<String, dynamic> message) async {
+        print('mesage received');
+        print("onMessage: $message");
+        var notification = message["notification"];
+        // _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text("Hi"),));
+        showDialog(
+          context: _scaffoldKey.currentState.context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text(notification["title"]),
+              content: Text(notification["body"]),
+              actions: <Widget>[
+                FlatButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text('OK'))
+              ],
+            );
+          },
+        );
+      },
+      onLaunch: (Map<String, dynamic> message) async {
+        print("onLaunch: $message");
+      },
+      onResume: (Map<String, dynamic> message) async {},
+    );
+  }
 
   @override
   void dispose() {

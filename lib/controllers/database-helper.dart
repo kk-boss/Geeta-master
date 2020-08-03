@@ -3,7 +3,7 @@ import 'package:path/path.dart' as Path;
 
 class DatabaseHelper {
   static Database _db;
-  static const String DATABASE_FILE_NAME = 'geeta.db';
+  static const String DATABASE_FILE_NAME = 'geeta.sqlite';
   static const String MAIN_TABLE_NAME = 'geeta';
   static const String AUDIO_TABLE_NAME = 'audio';
 

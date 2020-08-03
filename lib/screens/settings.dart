@@ -22,61 +22,83 @@ class _SettingsState extends State<Settings> {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
-      body: Consumer2<FontManager,LanguageManager>(
-        builder: (context, fontManager, languageManager,_) {
-          double fontSize = fontManager.fontSize;
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-                  ExpansionTile(
-                    title: Center(
-                      child: ListTile(
-                        title: Text('Font Size',style: TextStyle(fontSize: fontSize),),
-                        trailing: Text(fontSize.round().toString(),style: TextStyle(fontSize: fontSize),),
-                      ),
-                    ),
-                    children: [
-                      Slider(
-                        value: fontSize,
-                        min: 12.0,
-                        max: 25.0,
-                        onChanged: (double val) async {
-                          await fontManager.setFont(val);
-                        },
-                      ),
-                    ],
-                  ),
-              ListTile(
-                    title: Text("Language",style: TextStyle(fontSize: fontSize),),
-                    trailing: DropdownButton<int>(
-                      value: languageManager.language,
-                      items: [
-                        DropdownMenuItem(child: Text('Nepali',style: TextStyle(fontSize: fontSize),), value: 0),
-                        DropdownMenuItem(child: Text('English',style: TextStyle(fontSize: fontSize),), value: 1)
-                      ],
-                      onChanged: (val) async {
-                        if (val != null) {
-                          await languageManager.setLanguage(val);
-                        }
-                      },
-                    ),
-                  ),
-              InkWell(
+      body: Consumer2<FontManager, LanguageManager>(
+          builder: (context, fontManager, languageManager, _) {
+        double fontSize = fontManager.fontSize;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            ExpansionTile(
+              title: Center(
                 child: ListTile(
-                  title:  Text('Download Audios',style: TextStyle(fontSize: fontSize),),
+                  title: Text(
+                    'Font Size',
+                    style: TextStyle(fontSize: fontSize),
+                  ),
+                  trailing: Text(
+                    fontSize.round().toString(),
+                    style: TextStyle(fontSize: fontSize),
+                  ),
                 ),
-                onTap: () => Navigator.of(context).pushNamed('/audio'),
               ),
-              ListTile(
-                onTap: () {
-                  Navigator.of(context).pushNamed('/theme');
+              children: [
+                Slider(
+                  value: fontSize,
+                  min: 12.0,
+                  max: 25.0,
+                  onChanged: (double val) async {
+                    await fontManager.setFont(val);
+                  },
+                ),
+              ],
+            ),
+            ListTile(
+              title: Text(
+                "Language",
+                style: TextStyle(fontSize: fontSize),
+              ),
+              trailing: DropdownButton<int>(
+                value: languageManager.language,
+                items: [
+                  DropdownMenuItem(
+                      child: Text(
+                        'Nepali',
+                        style: TextStyle(fontSize: fontSize),
+                      ),
+                      value: 0),
+                  DropdownMenuItem(
+                      child: Text(
+                        'English',
+                        style: TextStyle(fontSize: fontSize),
+                      ),
+                      value: 1)
+                ],
+                onChanged: (val) async {
+                  if (val != null) {
+                    await languageManager.setLanguage(val);
+                  }
                 },
-                title: Text('Change Theme',style: TextStyle(fontSize: fontSize),),
               ),
-            ],
-          );
-        }
-      ),
+            ),
+            ListTile(
+              title: Text(
+                'Download Audios',
+                style: TextStyle(fontSize: fontSize),
+              ),
+              onTap: () => Navigator.of(context).pushNamed('/audio'),
+            ),
+            ListTile(
+              onTap: () {
+                Navigator.of(context).pushNamed('/theme');
+              },
+              title: Text(
+                'Change Theme',
+                style: TextStyle(fontSize: fontSize),
+              ),
+            ),
+          ],
+        );
+      }),
     );
   }
 }

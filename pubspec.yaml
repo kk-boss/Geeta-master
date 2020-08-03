@@ -11,7 +11,7 @@ description: Bhagavad Gita in Nepali and English with Audios.
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 2.0.0+4
+version: 2.0.1+5
 
 environment:
   sdk: ">=2.2.2 <3.0.0"
@@ -65,7 +65,8 @@ flutter:
    - assets/guru.jpg
    - assets/santosh.jpg
    - assets/aashish.jpg
-   - assets/geeta.db
+   - assets/geeta.sqlite
+   - assets/banner.png
   #  - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

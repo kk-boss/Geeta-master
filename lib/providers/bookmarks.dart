@@ -7,10 +7,6 @@ import '../controllers/database-helper.dart';
 class BookmarkManager with ChangeNotifier {
   List<Geeta> _bookmarks;
 
-  BookmarkManager() {
-    // _loadBookmark();
-  }
-
   void _loadBookmark() {
     DatabaseHelper.initDatabase().then((Database db) {
       db.query('geeta', where: 'isBookmark=?', whereArgs: [1]).then(

@@ -18,14 +18,4 @@ class Geeta {
       this.color,
       this.isBookmark,
       this.audio});
-  Map<String, dynamic> toMap() {
-    return {
-      'book': book,
-      'chapter': chapter,
-      'verse': verse,
-      'nepali': nepali,
-      'sanskrit': sanskrit,
-      'english': english,
-    };
-  }
 }

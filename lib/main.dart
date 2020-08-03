@@ -44,16 +44,16 @@ class _MyAppState extends State<MyApp> {
       DateTime time = DateTime.now();
       String prefTime = await getTime();
       if (prefTime == null) {
-        // _interstitialAd
-        //   ..load()
-        //   ..show();
+        _interstitialAd
+          ..load()
+          ..show();
         await setTime(time.toString());
       } else {
         Duration difference = time.difference(DateTime.parse(prefTime));
         if (difference.inMinutes > 10) {
-          // _interstitialAd
-          //   ..load()
-          //   ..show();
+          _interstitialAd
+            ..load()
+            ..show();
           await setTime(time.toString());
         }
       }
@@ -135,7 +135,7 @@ class _MyAppState extends State<MyApp> {
             '/test': (ctx) => FirebaseTest(),
           },
           builder: (context, widget) {
-            // _bannerAd..show();
+            _bannerAd..show();
             return Padding(
               padding: EdgeInsets.only(
                 bottom: _bottomPadding,

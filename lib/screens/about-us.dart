@@ -17,14 +17,14 @@ class AboutUs extends StatelessWidget {
         child: ListView(
           children: <Widget>[
             const Text(
-              'Developer:',
+              'Audio Recorded By:',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             Divider(),
-            Image.asset('assets/santosh.jpg',fit: BoxFit.cover),
+            Image.asset('assets/aashish.jpg', fit: BoxFit.cover),
             Divider(),
-             const Text(
-              'Santosh Thapa Magar',
+            const Text(
+              'Aashish Pathak',
               style: const TextStyle(
                   fontWeight: FontWeight.bold, color: Colors.blue),
               softWrap: true,
@@ -32,14 +32,14 @@ class AboutUs extends StatelessWidget {
             ),
             Divider(),
             const Text(
-              'Audio Recorded By:',
+              'Developer:',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             Divider(),
-            Image.asset('assets/aashish.jpg',fit: BoxFit.cover),
+            Image.asset('assets/santosh.jpg', fit: BoxFit.cover),
             Divider(),
-             const Text(
-              'Aashish Pathak',
+            const Text(
+              'Santosh Thapa Magar',
               style: const TextStyle(
                   fontWeight: FontWeight.bold, color: Colors.blue),
               softWrap: true,
@@ -59,9 +59,9 @@ class AboutUs extends StatelessWidget {
                       CustomIcons.facebook,
                       color: Colors.blue,
                     ),
-                    onPressed: () async{
+                    onPressed: () async {
                       const _url = 'https://www.facebook.com/santoshthapa896';
-                      if(await canLaunch(_url)){
+                      if (await canLaunch(_url)) {
                         await launch(_url);
                       }
                     }),
@@ -70,9 +70,9 @@ class AboutUs extends StatelessWidget {
                       CustomIcons.instagram,
                       color: Colors.blue,
                     ),
-                    onPressed: ()async {
-                      const _url ='https://www.instagram.com/new.santosh.3/';
-                       if(await canLaunch(_url)){
+                    onPressed: () async {
+                      const _url = 'https://www.instagram.com/new.santosh.3/';
+                      if (await canLaunch(_url)) {
                         await launch(_url);
                       }
                     }),
@@ -81,16 +81,16 @@ class AboutUs extends StatelessWidget {
                       CustomIcons.twitter,
                       color: Colors.blue,
                     ),
-                    onPressed: () async{
-                      const _url ='https://twitter.com/newsantosh3';
-                       if(await canLaunch(_url)){
+                    onPressed: () async {
+                      const _url = 'https://twitter.com/newsantosh3';
+                      if (await canLaunch(_url)) {
                         await launch(_url);
                       }
                     }),
               ],
             ),
             Divider(),
-           const Text(
+            const Text(
               'Special Thanks:',
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),

@@ -11,9 +11,10 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
 import '../providers/gita.dart';
+import '../controllers/ad-manager.dart';
 
 class AudioList extends StatefulWidget {
-  AudioList({Key key, this.index, this.isdownload, this.chapter})
+  const AudioList({Key key, this.index, this.isdownload, this.chapter})
       : super(key: key);
   final int index;
   final int isdownload;
@@ -24,7 +25,7 @@ class AudioList extends StatefulWidget {
 
 class _AudioListState extends State<AudioList> {
   static const List<String> uri = [
-    'https://firebasestorage.googleapis.com/v0/b/shreemad-bhagvad-gita.appspot.com/o/1.zip?alt=media&token=ded8ffa3-197a-4aea-9320-61adac2e7322',
+    'https://firebasestorage.googleapis.com/v0/b/shreemad-bhagvad-gita.appspot.com/o/1.zip?alt=media&token=3988f9b7-6d08-4c11-adad-5bb9984f943f',
     'https://firebasestorage.googleapis.com/v0/b/shreemad-bhagvad-gita.appspot.com/o/2.zip?alt=media&token=b7d6ce7a-55f9-4bc7-871e-41fd4e01ec9f',
     'https://firebasestorage.googleapis.com/v0/b/shreemad-bhagvad-gita.appspot.com/o/3.zip?alt=media&token=0f2a3dbc-f78e-4128-94f9-54f90992646c',
     'https://firebasestorage.googleapis.com/v0/b/shreemad-bhagvad-gita.appspot.com/o/4.zip?alt=media&token=b43ce962-6419-4bb8-ba1a-96ddcc7d200c',
@@ -36,6 +37,12 @@ class _AudioListState extends State<AudioList> {
     'https://firebasestorage.googleapis.com/v0/b/shreemad-bhagvad-gita.appspot.com/o/10.zip?alt=media&token=f296c871-e61d-4209-bb42-478d631c98ba',
     'https://firebasestorage.googleapis.com/v0/b/shreemad-bhagvad-gita.appspot.com/o/11.zip?alt=media&token=a13c9b1f-aff4-4888-b3a2-7a71548bd9d8',
     'https://firebasestorage.googleapis.com/v0/b/shreemad-bhagvad-gita.appspot.com/o/12.zip?alt=media&token=b3292f40-2ae3-46c4-a861-831cc6bb3df2',
+    'https://firebasestorage.googleapis.com/v0/b/shreemad-bhagvad-gita.appspot.com/o/13.zip?alt=media&token=88eca29d-10bc-4f6f-99ca-b5d750e2e6a4',
+    'https://firebasestorage.googleapis.com/v0/b/shreemad-bhagvad-gita.appspot.com/o/14.zip?alt=media&token=6194e4b4-794a-468d-b948-8b45d8b27124',
+    'https://firebasestorage.googleapis.com/v0/b/shreemad-bhagvad-gita.appspot.com/o/15.zip?alt=media&token=9275bcb9-9aab-4ed9-b97a-5b92ec2ac21c',
+    'https://firebasestorage.googleapis.com/v0/b/shreemad-bhagvad-gita.appspot.com/o/16.zip?alt=media&token=d05582a3-c63b-4306-a133-4c5a22e5e8f0',
+    'https://firebasestorage.googleapis.com/v0/b/shreemad-bhagvad-gita.appspot.com/o/17.zip?alt=media&token=830ebb41-6403-4a6d-b9b5-c94d7da1e0d9',
+    'https://firebasestorage.googleapis.com/v0/b/shreemad-bhagvad-gita.appspot.com/o/18.zip?alt=media&token=c6157c6c-978f-45d4-978c-cca3198289bd',
   ];
   int _isdownload;
   int _download = 0;
@@ -84,21 +91,6 @@ class _AudioListState extends State<AudioList> {
     });
   }
 
-  // Future<void> unZip(File file, String dir) async {
-  //   final destPath = Directory('$dir/audio/');
-  //   print(destPath);
-  //   try {
-  //     FlutterArchive.unzip(zipFile: file, destinationDir: destPath).then((_) {
-  //       Download.updateAudio(widget.chapter, true);
-  //       file.deleteSync(recursive: true);
-  //       setState(() {
-  //         _download = 3;
-  //       });
-  //     });
-  //   } catch (e) {
-  //     print(e);
-  //   }
-  // }
   Future<void> unZip(File file, String dir) async {
     final bytes = file.readAsBytesSync();
     final archive = ZipDecoder().decodeBytes(bytes);
@@ -121,6 +113,7 @@ class _AudioListState extends State<AudioList> {
       _download = 0;
       _isdownload = 1;
     });
+    AdManager().loadInterAd();
   }
 
   @override

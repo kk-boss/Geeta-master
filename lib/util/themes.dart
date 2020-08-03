@@ -20,7 +20,7 @@ final Map<AppTheme, ThemeData> appThemeData = {
   AppTheme.Dark: ThemeData(
     brightness: Brightness.dark,
     primaryColor: Colors.black,
-    accentColor: Colors.purple,
+    accentColor: Colors.tealAccent,
     cardColor: Colors.black,
     textTheme: TextTheme(
       headline6: TextStyle(color: Colors.black),
@@ -45,7 +45,7 @@ final Map<AppTheme, ThemeData> appThemeData = {
       headline5: TextStyle(color: Colors.black),
     ),
   ),
-   AppTheme.PurpleLight: ThemeData(
+  AppTheme.PurpleLight: ThemeData(
     brightness: Brightness.light,
     primaryColor: Color(0xFF9C27B0),
     accentColor: Color(0xFFFFCA28),
@@ -54,7 +54,7 @@ final Map<AppTheme, ThemeData> appThemeData = {
       headline5: TextStyle(color: Colors.black),
     ),
   ),
-   AppTheme.VioletLight: ThemeData(
+  AppTheme.VioletLight: ThemeData(
     brightness: Brightness.light,
     primaryColor: Color(0xFF673AB7),
     accentColor: Color(0xFF2196F3),

@@ -11,7 +11,6 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
 import '../providers/gita.dart';
-import '../controllers/ad-manager.dart';
 
 class AudioList extends StatefulWidget {
   const AudioList({Key key, this.index, this.isdownload, this.chapter})
@@ -113,7 +112,6 @@ class _AudioListState extends State<AudioList> {
       _download = 0;
       _isdownload = 1;
     });
-    AdManager().loadInterAd();
   }
 
   @override

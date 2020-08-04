@@ -4,13 +4,18 @@ import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 
 class MyAudio with ChangeNotifier {
-  int playingverse;
-  int playingchapter;
+  MyAudio._internal();
+  static final _instance = MyAudio._internal();
+  factory MyAudio() {
+    return _instance;
+  }
+
+  int playingverse = 0;
+  int playingchapter = 0;
   Duration duration = Duration(seconds: 0);
   AudioPlaybackState audioPlaybackState = AudioPlaybackState.none;
   AudioPlayer audioPlayer = AudioPlayer();
 
-  MyAudio({this.playingverse = 0, this.playingchapter = 0});
   Future<String> getPath() async {
     return (await getApplicationDocumentsDirectory()).path;
   }

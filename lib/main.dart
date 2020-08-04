@@ -28,7 +28,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    _bannerAd = createBannerAd()..load();
+    _bannerAd = createBannerAd();
     _interstitialAd = InterstitialAd(
       adUnitId: interId,
       listener: (event) {
@@ -135,7 +135,9 @@ class _MyAppState extends State<MyApp> {
             '/test': (ctx) => FirebaseTest(),
           },
           builder: (context, widget) {
-            _bannerAd..show();
+            _bannerAd.load().then((value) => {
+                  if (value) {_bannerAd.show()}
+                });
             return Padding(
               padding: EdgeInsets.only(
                 bottom: _bottomPadding,

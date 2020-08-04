@@ -17,21 +17,6 @@ class AboutUs extends StatelessWidget {
         child: ListView(
           children: <Widget>[
             const Text(
-              'Audio Recorded By:',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            Divider(),
-            Image.asset('assets/aashish.jpg', fit: BoxFit.cover),
-            Divider(),
-            const Text(
-              'Aashish Pathak',
-              style: const TextStyle(
-                  fontWeight: FontWeight.bold, color: Colors.blue),
-              softWrap: true,
-              textAlign: TextAlign.center,
-            ),
-            Divider(),
-            const Text(
               'Developer:',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
@@ -89,6 +74,21 @@ class AboutUs extends StatelessWidget {
                     }),
               ],
             ),
+            const Text(
+              'Audio Recorded By:',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            Divider(),
+            Image.asset('assets/aashish.jpg', fit: BoxFit.cover),
+            Divider(),
+            const Text(
+              'Aashish Pathak',
+              style: const TextStyle(
+                  fontWeight: FontWeight.bold, color: Colors.blue),
+              softWrap: true,
+              textAlign: TextAlign.center,
+            ),
+            Divider(),
             Divider(),
             const Text(
               'Special Thanks:',

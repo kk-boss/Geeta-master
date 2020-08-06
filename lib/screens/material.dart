@@ -21,11 +21,13 @@ class _MyMaterialAppState extends State<MyMaterialApp>
   BannerAd _bannerAd;
   Timer _timer;
   InterstitialAd _interstitialAd;
-  AppLifecycleState _state;
+  AppLifecycleState _state = AppLifecycleState.resumed;
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    print(state);
+    setState(() {
+      _state = state;
+    });
   }
 
   @override
@@ -51,7 +53,7 @@ class _MyMaterialAppState extends State<MyMaterialApp>
         await setTime(time.toString());
       } else {
         Duration difference = time.difference(DateTime.parse(prefTime));
-        if (difference.inMinutes > 10) {
+        if (_state == AppLifecycleState.resumed && difference.inMinutes > 10) {
           _interstitialAd
             ..load()
             ..show();
@@ -84,6 +86,7 @@ class _MyMaterialAppState extends State<MyMaterialApp>
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _bannerAd?.dispose();
     _timer.cancel();
     _interstitialAd.dispose();
@@ -109,9 +112,10 @@ class _MyMaterialAppState extends State<MyMaterialApp>
           '/test': (ctx) => FirebaseTest(),
         },
         builder: (context, widget) {
-          _bannerAd.load().then((value) => {
-                if (value) {_bannerAd.show()}
-              });
+          if (_state == AppLifecycleState.resumed)
+            _bannerAd.load().then((value) => {
+                  if (value) {_bannerAd.show()}
+                });
           return Padding(
             padding: EdgeInsets.only(
               bottom: _bottomPadding,

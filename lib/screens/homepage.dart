@@ -64,6 +64,12 @@ class _HomeState extends State<Home> {
   }
 
   @override
+  void didChangeDependencies() {
+    precacheImage(AssetImage('assets/banner.png'), context);
+    super.didChangeDependencies();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final mediaquery = MediaQuery.of(context);
     final gita = Provider.of<Gita>(context);

@@ -59,6 +59,14 @@ class Gita with ChangeNotifier {
     await setSavedState(book, chapter);
   }
 
+  void nextPage() {
+    fetchAndSetData(book, chapter + 1);
+  }
+
+  void previousPage() {
+    fetchAndSetData(book, chapter - 1);
+  }
+
   Future<void> fetchAndSetAudioData() async {
     final Database db = await DatabaseHelper.initDatabase();
     final List<Map<String, dynamic>> maps =

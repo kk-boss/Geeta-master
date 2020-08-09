@@ -1,34 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../models/book.dart';
-import '../providers/font.dart';
 
-class ChoiceScreen extends StatefulWidget {
+class Choice extends StatefulWidget {
+  Choice({Key key}) : super(key: key);
+
   @override
-  _ChoiceScreenState createState() => _ChoiceScreenState();
+  _ChoiceState createState() => _ChoiceState();
 }
 
-class _ChoiceScreenState extends State<ChoiceScreen> {
+class _ChoiceState extends State<Choice> {
   int _chapterCount = 0;
   int _id = 0;
   bool _firstRun = true;
-  int _initialIndex = 0;
-  @override
-  void initState() {
-    super.initState();
-  }
+  var _currentIndex = 0;
+  var _title = 'Choose Book';
 
   @override
   void didChangeDependencies() {
     if (_firstRun) {
       var routeArgs =
-          ModalRoute.of(context).settings.arguments as Map<String, int>;
+          ModalRoute.of(context).settings.arguments as Map<String, dynamic>;
       if (routeArgs != null) {
         _id = routeArgs["id"];
-        _chapterCount =
-            BOOK.where((test) => test.id == _id).toList()[0].chapter;
-        _initialIndex = 1;
+        _chapterCount = BOOK.firstWhere((test) => test.id == _id).chapter;
+        _currentIndex = 1;
+        _title = routeArgs['title'];
       }
       _firstRun = false;
     }
@@ -38,98 +35,90 @@ class _ChoiceScreenState extends State<ChoiceScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Consumer<FontManager>(builder: (context, manager, _) {
-        return DefaultTabController(
-          length: 2,
-          initialIndex: _initialIndex,
-          child: Scaffold(
-            appBar: AppBar(
-              title: TabBar(
-                tabs: [
-                  Tab(
-                    child: Text(
-                      'Book',
-                      style: TextStyle(fontSize: manager.fontSize),
-                    ),
-                  ),
-                  Tab(
-                    child: Text(
-                      'Chapter',
-                      style: TextStyle(fontSize: manager.fontSize),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            body: TabBarView(
-              children: [
-                ListView.builder(
-                  itemCount: BOOK.length,
-                  itemBuilder: (ctx, i) {
-                    return buildListTile(
-                        ctx,
-                        BOOK.where((test) => test.id == i + 1).toList(),
-                        manager.fontSize);
-                  },
-                ),
-                GridView.builder(
-                  gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                    maxCrossAxisExtent: 50,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                  ),
-                  itemCount: _chapterCount,
-                  itemBuilder: (ctx, i) {
-                    return InkWell(
-                      child: Container(
-                        child: Center(
-                          child: Text(
-                            (i + 1).toString(),
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: manager.fontSize),
-                          ),
-                        ),
-                        decoration: BoxDecoration(color: Colors.deepPurple),
-                      ),
-                      onTap: () async {
-                        // Navigator.of(context).pushNamedAndRemoveUntil(
-                        //     '/', (Route<dynamic> route) => false,
-                        //     arguments: {
-                        //       'chapter': i,
-                        //       'id': _id,
-                        //     });
-                        Navigator.of(context).pop({
-                          'chapter': i,
-                          'id': _id,
-                        });
-                      },
-                    );
-                  },
-                ),
-              ],
-            ),
+      appBar: AppBar(
+        title: Text(_title),
+      ),
+      body: _currentIndex == 0
+          ? buildListTile(context, 16)
+          : buildGridView(16, context, _chapterCount),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        items: [
+          BottomNavigationBarItem(icon: Icon(Icons.book), title: Text('Book')),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.library_books),
+            title: Text('Chapter'),
           ),
-        );
-      }),
+        ],
+        onTap: _currentIndex == 1
+            ? (index) {
+                setState(() {
+                  _currentIndex = index;
+                  _title = 'Choose Book';
+                });
+              }
+            : null,
+      ),
     );
   }
 
-  Widget buildListTile(BuildContext ctx, List book, double fontSize) {
-    return InkWell(
-      child: ListTile(
-        leading: Text((book[0].id).toString()),
-        title: Text(
-          book[0].title,
-          style: TextStyle(fontSize: fontSize),
-        ),
-      ),
-      onTap: () {
-        DefaultTabController.of(ctx).animateTo(1);
-        setState(() {
-          _chapterCount = book[0].chapter;
-          _id = book[0].id;
+  Widget buildListTile(BuildContext ctx, double fontSize) {
+    return ListView.builder(
+        itemCount: BOOK.length,
+        itemBuilder: (context, index) {
+          final book = BOOK.firstWhere((test) => test.id == index + 1);
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Card(
+              elevation: 5.0,
+              child: ListTile(
+                leading: Text((book.id).toString()),
+                title: Text(
+                  book.title,
+                  style: TextStyle(fontSize: fontSize),
+                ),
+                onTap: () {
+                  setState(() {
+                    _chapterCount = book.chapter;
+                    _id = book.id;
+                    _currentIndex = 1;
+                    _title = book.title;
+                  });
+                },
+              ),
+            ),
+          );
         });
+  }
+
+  GridView buildGridView(
+      double fontSize, BuildContext context, int chapterCount) {
+    print('building gridView $chapterCount');
+    return GridView.builder(
+      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+        maxCrossAxisExtent: 50,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+      ),
+      itemCount: chapterCount,
+      itemBuilder: (ctx, i) {
+        return InkWell(
+          child: Container(
+            child: Center(
+              child: Text(
+                (i + 1).toString(),
+                style: TextStyle(color: Colors.white, fontSize: fontSize),
+              ),
+            ),
+            decoration: BoxDecoration(color: Colors.deepPurple),
+          ),
+          onTap: () {
+            Navigator.of(context).pop({
+              'chapter': i,
+              'id': _id,
+            });
+          },
+        );
       },
     );
   }

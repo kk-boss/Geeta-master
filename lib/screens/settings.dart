@@ -54,7 +54,7 @@ class _SettingsState extends State<Settings> {
             ),
             ListTile(
               title: Text(
-                "Language",
+                "Translation Language",
                 style: TextStyle(fontSize: fontSize),
               ),
               trailing: DropdownButton<int>(

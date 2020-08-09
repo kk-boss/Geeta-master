@@ -101,7 +101,7 @@ class _MyMaterialAppState extends State<MyMaterialApp>
         title: 'Bhagavad Gita',
         home: Home(),
         routes: {
-          '/choice': (ctx) => ChoiceScreen(),
+          '/choice': (ctx) => Choice(),
           '/bookmarks': (ctx) => Bookmarks(),
           '/settings': (ctx) => Settings(),
           '/search': (ctx) => Search(),
@@ -113,9 +113,14 @@ class _MyMaterialAppState extends State<MyMaterialApp>
         },
         builder: (context, widget) {
           if (_state == AppLifecycleState.resumed)
-            _bannerAd.load().then((value) => {
-                  if (value) {_bannerAd.show()}
-                });
+            _bannerAd
+                .load()
+                .then((value) => {
+                      if (value) {_bannerAd.show()}
+                    })
+                .catchError((err) {
+              print(err);
+            });
           return Padding(
             padding: EdgeInsets.only(
               bottom: _bottomPadding,

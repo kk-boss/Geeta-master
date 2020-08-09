@@ -74,10 +74,8 @@ class _HomeState extends State<Home> {
     final mediaquery = MediaQuery.of(context);
     final gita = Provider.of<Gita>(context);
     final selectionProvider = Provider.of<Selection>(context);
-    final String title =
-        BOOK.where((test) => test.id == gita.book).toList().first.title;
-    final int chapter =
-        BOOK.where((test) => test.id == gita.book).toList().first.chapter;
+    final String title = BOOK.firstWhere((test) => test.id == gita.book).title;
+    final int chapter = BOOK.firstWhere((test) => test.id == gita.book).chapter;
     return WillPopScope(
       onWillPop: () {
         DateTime now = DateTime.now();
@@ -107,8 +105,7 @@ class _HomeState extends State<Home> {
                         icon: Icon(Icons.arrow_back_ios),
                         onPressed: (gita.chapter > 1)
                             ? () {
-                                gita.fetchAndSetData(
-                                    gita.book, gita.chapter - 1);
+                                gita.previousPage();
                               }
                             : null,
                       ),
@@ -139,7 +136,8 @@ class _HomeState extends State<Home> {
                           final result = await Navigator.of(context)
                               .pushNamed('/choice', arguments: {
                             'id': gita.book,
-                            'chapter': gita.chapter + 1
+                            'chapter': gita.chapter + 1,
+                            'title': title,
                           }) as Map<String, int>;
                           if (result != null) {
                             await gita.fetchAndSetData(
@@ -154,8 +152,7 @@ class _HomeState extends State<Home> {
                         icon: Icon(Icons.arrow_forward_ios),
                         onPressed: (gita.chapter < chapter)
                             ? () {
-                                gita.fetchAndSetData(
-                                    gita.book, gita.chapter + 1);
+                                gita.nextPage();
                               }
                             : null,
                       ),

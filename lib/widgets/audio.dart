@@ -11,39 +11,20 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
 import '../providers/gita.dart';
-import '../controllers/ad-manager.dart';
 
 class AudioList extends StatefulWidget {
-  const AudioList({Key key, this.index, this.isdownload, this.chapter})
+  const AudioList(
+      {Key key, this.index, this.isdownload, this.chapter, this.audioUrl})
       : super(key: key);
   final int index;
   final int isdownload;
   final int chapter;
+  final String audioUrl;
   @override
   _AudioListState createState() => _AudioListState();
 }
 
 class _AudioListState extends State<AudioList> {
-  static const List<String> uri = [
-    'https://firebasestorage.googleapis.com/v0/b/shreemad-bhagvad-gita.appspot.com/o/1.zip?alt=media&token=3988f9b7-6d08-4c11-adad-5bb9984f943f',
-    'https://firebasestorage.googleapis.com/v0/b/shreemad-bhagvad-gita.appspot.com/o/2.zip?alt=media&token=b7d6ce7a-55f9-4bc7-871e-41fd4e01ec9f',
-    'https://firebasestorage.googleapis.com/v0/b/shreemad-bhagvad-gita.appspot.com/o/3.zip?alt=media&token=0f2a3dbc-f78e-4128-94f9-54f90992646c',
-    'https://firebasestorage.googleapis.com/v0/b/shreemad-bhagvad-gita.appspot.com/o/4.zip?alt=media&token=b43ce962-6419-4bb8-ba1a-96ddcc7d200c',
-    'https://firebasestorage.googleapis.com/v0/b/shreemad-bhagvad-gita.appspot.com/o/5.zip?alt=media&token=3917eada-1fdf-403a-a68f-15b21044c464',
-    'https://firebasestorage.googleapis.com/v0/b/shreemad-bhagvad-gita.appspot.com/o/6.zip?alt=media&token=ce912854-f589-40ee-974d-3f1c7f1e2aef',
-    'https://firebasestorage.googleapis.com/v0/b/shreemad-bhagvad-gita.appspot.com/o/7.zip?alt=media&token=7bca5316-eb57-4e60-9c25-fe9bd9ba60d5',
-    'https://firebasestorage.googleapis.com/v0/b/shreemad-bhagvad-gita.appspot.com/o/8.zip?alt=media&token=4ddbc79b-19ac-4161-afb0-fb58cd00ad18',
-    'https://firebasestorage.googleapis.com/v0/b/shreemad-bhagvad-gita.appspot.com/o/9.zip?alt=media&token=e75f97a6-2153-4aa3-a119-adc74f05e43e',
-    'https://firebasestorage.googleapis.com/v0/b/shreemad-bhagvad-gita.appspot.com/o/10.zip?alt=media&token=f296c871-e61d-4209-bb42-478d631c98ba',
-    'https://firebasestorage.googleapis.com/v0/b/shreemad-bhagvad-gita.appspot.com/o/11.zip?alt=media&token=a13c9b1f-aff4-4888-b3a2-7a71548bd9d8',
-    'https://firebasestorage.googleapis.com/v0/b/shreemad-bhagvad-gita.appspot.com/o/12.zip?alt=media&token=b3292f40-2ae3-46c4-a861-831cc6bb3df2',
-    'https://firebasestorage.googleapis.com/v0/b/shreemad-bhagvad-gita.appspot.com/o/13.zip?alt=media&token=88eca29d-10bc-4f6f-99ca-b5d750e2e6a4',
-    'https://firebasestorage.googleapis.com/v0/b/shreemad-bhagvad-gita.appspot.com/o/14.zip?alt=media&token=6194e4b4-794a-468d-b948-8b45d8b27124',
-    'https://firebasestorage.googleapis.com/v0/b/shreemad-bhagvad-gita.appspot.com/o/15.zip?alt=media&token=9275bcb9-9aab-4ed9-b97a-5b92ec2ac21c',
-    'https://firebasestorage.googleapis.com/v0/b/shreemad-bhagvad-gita.appspot.com/o/16.zip?alt=media&token=d05582a3-c63b-4306-a133-4c5a22e5e8f0',
-    'https://firebasestorage.googleapis.com/v0/b/shreemad-bhagvad-gita.appspot.com/o/17.zip?alt=media&token=830ebb41-6403-4a6d-b9b5-c94d7da1e0d9',
-    'https://firebasestorage.googleapis.com/v0/b/shreemad-bhagvad-gita.appspot.com/o/18.zip?alt=media&token=c6157c6c-978f-45d4-978c-cca3198289bd',
-  ];
   int _isdownload;
   int _download = 0;
   double _ptr = 0.0;
@@ -93,27 +74,51 @@ class _AudioListState extends State<AudioList> {
 
   Future<void> unZip(File file, String dir) async {
     final bytes = file.readAsBytesSync();
-    final archive = ZipDecoder().decodeBytes(bytes);
-    for (final file in archive) {
-      final filename = file.name;
-      print(file.isFile);
-      if (file.isFile) {
-        final data = file.content as List<int>;
-        File('$dir/audio/' + filename)
-          ..createSync(recursive: true)
-          ..writeAsBytesSync(data);
-      } else {
-        Directory('$dir/audio/' + filename)..create(recursive: true);
+    try {
+      final archive = ZipDecoder().decodeBytes(bytes);
+      for (final file in archive) {
+        final filename = file.name;
+        print(file.isFile);
+        if (file.isFile) {
+          final data = file.content as List<int>;
+          File('$dir/audio/' + filename)
+            ..createSync(recursive: true)
+            ..writeAsBytesSync(data);
+        } else {
+          Directory('$dir/audio/' + filename)..create(recursive: true);
+        }
       }
+      await Provider.of<Gita>(context, listen: false)
+          .updateAudio(widget.chapter, true);
+      file.deleteSync(recursive: true);
+      setState(() {
+        _download = 0;
+        _isdownload = 1;
+      });
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('An error occured'),
+            content: Text(
+                'Could not complete download. Please try again by changing server.'),
+            actions: [
+              FlatButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text('Close'),
+              ),
+            ],
+          );
+        },
+      );
+      setState(() {
+        _isdownload = widget.isdownload;
+        _download = 0;
+      });
     }
-    await Provider.of<Gita>(context, listen: false)
-        .updateAudio(widget.chapter, true);
-    file.deleteSync(recursive: true);
-    setState(() {
-      _download = 0;
-      _isdownload = 1;
-    });
-    AdManager().loadInterAd();
   }
 
   @override
@@ -182,24 +187,22 @@ class _AudioListState extends State<AudioList> {
               if (_isdownload == 0)
                 IconButton(
                     icon: Icon(Icons.file_download),
-                    onPressed: widget.index < uri.length
-                        ? () async {
-                            var connection =
-                                await (Connectivity().checkConnectivity());
-                            if (connection == ConnectivityResult.none) {
-                              Scaffold.of(context).hideCurrentSnackBar();
-                              Scaffold.of(context).showSnackBar(SnackBar(
-                                content: const Text('No internet connection'),
-                              ));
-                              return;
-                            }
-                            setState(() {
-                              _download = 1;
-                              _isdownload = 2;
-                            });
-                            await download(uri[widget.index]);
-                          }
-                        : null)
+                    onPressed: () async {
+                      var connection =
+                          await (Connectivity().checkConnectivity());
+                      if (connection == ConnectivityResult.none) {
+                        Scaffold.of(context).hideCurrentSnackBar();
+                        Scaffold.of(context).showSnackBar(SnackBar(
+                          content: const Text('No internet connection'),
+                        ));
+                        return;
+                      }
+                      setState(() {
+                        _download = 1;
+                        _isdownload = 2;
+                      });
+                      await download(widget.audioUrl);
+                    })
             ],
           ),
         ],
